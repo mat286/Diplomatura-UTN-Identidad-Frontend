@@ -1,70 +1,64 @@
-# Getting Started with Create React App
+# PoC: Enrolamiento y Verificación Facial (face-api.js)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Este proyecto es una Prueba de Concepto (PoC) implementada en React para demostrar el **enrolamiento** y la **verificación (matching)** de identidad facial utilizando la librería `face-api.js`.
+"https://github.com/justadudewhohacks/face-api.js/tree/master"
 
-## Available Scripts
+El mecanismo central es la extracción de un **Descriptor Facial** (un vector matemático único que representa la cara), que se almacena en el navegador y se usa para comparar futuras capturas.
 
-In the project directory, you can run:
+## 🚀 Requisitos y Configuración
 
-### `npm start`
+### 1. Modelos Necesarios
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+La aplicación depende de la carga de tres modelos de red neuronal. **Debes descargar los archivos JSON y Weights** (incluidos los `shards` y `manifests`) para los siguientes modelos y colocarlos en la carpeta **`public/models`** de tu proyecto React:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+| Modelo en el Código | Propósito | Archivo JSON Principal |
+| :--- | :--- | :--- |
+| `tinyFaceDetector` | Detección de rostro. | `tiny_face_detector_model.json` |
+| `faceLandmark68Net` | Detección de 68 puntos clave. | `face_landmark_68_model.json` |
+| `faceRecognitionNet` | Extracción del Descriptor Facial. | `face_recognition_model.json` |
 
-### `npm test`
+### 2. Estructura de Archivos
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Tu directorio `public` debe tener la siguiente estructura:
+```
+/public
+└── models/
+├── tiny_face_detector_model.json
+├── face_landmark_68_model.json
+└── face_recognition_model.json
+└── ... (Archivos de pesos/weights/shards)
+```
 
-### `npm run build`
+## 🛠️ Explicación del Funcionamiento del Código
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+El código (`App.jsx`) implementa el flujo de enrolamiento y verificación usando el almacenamiento local del navegador (`localStorage`) para persistir la información de identidad.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 1. Inicialización (`useEffect` & `loadModels`)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1.  **Carga de Modelos:** La función asíncrona `loadModels()` se ejecuta al inicio y llama a `faceapi.nets.XYZ.loadFromUri('/models')` para cargar las tres redes neuronales.
+2.  **Cámara:** Una vez que `modelsLoaded` es `true`, un segundo `useEffect` solicita acceso a la cámara (`navigator.mediaDevices.getUserMedia`) e inicia la transmisión en el elemento `<video>`.
 
-### `npm run eject`
+### 2. Enrolamiento (`handleEnroll`)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Esta función extrae la "huella digital" de la cara para guardarla:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1.  **Detección y Extracción:** Captura un *frame* en el `<canvas>` y utiliza el *pipeline* de `faceapi.detectSingleFace().withFaceLandmarks().withFaceDescriptor()` para obtener el **Descriptor Facial** (`Float32Array` de 128 elementos).
+2.  **Cálculo del Hash de Identidad:** Se calcula un **SHA-256** (`sha256HexFromBuffer`) del Descriptor Facial. Este *hash* sirve como una prueba de integridad o **ID de identidad inmutable**.
+3.  **Almacenamiento:**
+    * El Descriptor Facial se convierte a **Base64** (`descriptor_b64`) y se guarda en `localStorage`.
+    * El hash SHA-256 (`hashIdentidad`) se guarda en `localStorage`.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### 3. Verificación (`handleVerify`)
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Esta función comprueba si la cara actual coincide con el registro guardado:
 
-## Learn More
+1.  **Nueva Captura y Extracción:** Se obtiene un nuevo Descriptor Facial (`newDesc`) de la persona actual.
+2.  **Recuperación:** Se recupera el Descriptor almacenado (`storedFloat`) del `localStorage`.
+3.  **Matching por Distancia:** Se calcula la **Distancia Euclidiana** (`euclideanDistance`) entre el Descriptor almacenado y el nuevo.
+    * Si la distancia es $\le 0.5$ (la tolerancia configurada), se considera un **MATCH**.
+4.  **Verificación Criptográfica (Integridad):** Se recalcula el hash SHA-256 del descriptor almacenado y se compara con el `hashIdentidad` guardado, asegurando que el registro no fue alterado.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### ⚠️ Nota de Seguridad
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+El código utiliza `localStorage` para guardar el descriptor. **En un entorno de producción, esta información sensible debe ser cifrada robustamente** (por ejemplo, con Web Crypto API o claves derivadas de una contraseña) antes de ser almacenada o enviada a un sistema externo (como IPFS o una *blockchain*).
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
