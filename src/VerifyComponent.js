@@ -8,6 +8,7 @@ import {
     loadModels,
     base64ToUint8Array,
 } from "./funciones/identityHash";
+import './VerifyComponent.css'
 
 /**
  * VerifyComponent estilizado (sin dependencias CSS externas)
@@ -186,7 +187,7 @@ export default function VerifyComponent() {
     return (
         <div className="verify-root">
             <style>{`
-        :root{
+        /* :root{
           --bg:#f6f8fb; --card:#ffffff; --muted:#6b7280; --accent:#0ea5a4; --primary:#2563eb;
         }
         .verify-root{font-family:Inter,Arial,Helvetica,sans-serif;padding:18px;max-width:1100px;margin:0 auto}
@@ -219,7 +220,7 @@ export default function VerifyComponent() {
         @media (max-width:900px){
           .container{flex-direction:column}
           .left{width:100%;flex:1}
-        }
+        } */
       `}</style>
 
             <div className="header">

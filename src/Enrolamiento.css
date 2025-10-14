@@ -1,0 +1,68 @@
+.enrol-root {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 18px;
+    font-family: Inter, Arial, Helvetica, sans-serif
+}
+
+.panel {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap
+}
+
+.video-card,
+.info-card {
+    background: var(--card);
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06)
+}
+
+.video-card {
+    flex: 1;
+    min-width: 280px
+}
+
+.info-card {
+    flex: 1;
+    min-width: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start
+}
+
+button {
+    background: var(--primary);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700
+}
+
+button[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed
+}
+
+.controls {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap
+}
+
+.note {
+    font-size: 13px;
+    color: var(--muted)
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 6px
+}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ImageDisplay from './ImageDisplay';
 
 /**
  * Forms - Formulario para añadir personas
@@ -13,7 +14,7 @@ import React, { useState, useEffect } from 'react';
  *  - Si onAddPerson existe, Forms delega la adición al padre y NO sobrescribe peopleList en localStorage.
  */
 
-// Función auxiliar para obtener el array de personas desde Local Storage
+// Función auxiliar para obtener el array de personas desde Local Storage 
 const getInitialPeople = () => {
     const savedPeople = localStorage.getItem('peopleList');
     try {
@@ -29,14 +30,40 @@ const initialFormData = {
     nombre: '',
     apellido: '',
     sexo: '',
+    genero: '',
+    etnia: '',
+    nfamilia: '',
     dni: '',
     nivelEscolar: '',
     fechaNacimiento: '',
     email: '',
     telefono: '',
+    zona: '',
+    provincia: '',
+    productor: [],
+    productorOtro: '',
+    nivel: '',
+    superficiePredio: '',
+    superficieProductiva: '',
+    interesCapacitacion: [],
+    interesCapacitacionOtro: '',
 };
 
-const Forms = ({ cerrarForm, onAddPerson } = {}) => {
+// Estas constantes deben estar fuera del componente o dentro para Forms.js
+const OPCIONES_PRODUCCION = [
+    "apicultura", "bovino", "avícola", "caprino", "porcino",
+    "ovino", "agrofloresta", "leña", "carbonero", "algarroba", "otros"
+];
+
+const OPCIONES_NIVEL = [
+    { value: 'inicial', label: 'Inicial (recién comienza)' },
+    { value: 'intermedio', label: 'Intermedio (produce y vende localmente)' },
+    { value: 'experto', label: 'Experto (comercializa con intermediarios)' }
+];
+
+
+
+const Forms = ({ cerrarForm, onAddPerson, data } = {}) => {
     // Estado para la nueva persona
     const [formData, setFormData] = useState(initialFormData);
 
@@ -71,6 +98,8 @@ const Forms = ({ cerrarForm, onAddPerson } = {}) => {
             id: Date.now(),
             helperData,
             hashIdentidad,
+            offlineImageKey: data.imagenSelfie || null, // data provista por el padre (offlineKey)
+            offlineImageDNIKey: data.imagenDNI || null,
         };
 
         // Si el padre nos dio una función, la usamos (estado centralizado)
@@ -98,15 +127,38 @@ const Forms = ({ cerrarForm, onAddPerson } = {}) => {
         }, 1200);
     };
 
+
+    // Asumiendo que Forms.js tiene acceso a esta función
+    const handleCheckboxChange = (event) => {
+        const { name, value, checked } = event.target;
+
+        // Si el campo no existe o no es un array, se usa la lógica estándar
+        // Aquí es donde ajustas el formData (si usas useState, sería setFormData)
+        if (checked) {
+            // Añadir el valor si está marcado
+            setFormData(prevData => ({
+                ...prevData,
+                [name]: [...prevData[name], value],
+            }));
+        } else {
+            // Eliminar el valor si está desmarcado
+            setFormData(prevData => ({
+                ...prevData,
+                [name]: prevData[name].filter(v => v !== value),
+            }));
+        }
+    };
+
     return (
-        <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '8px', maxWidth: '700px', margin: 'auto', background: '#fff' }}>
-            <h2>Registro de Personas</h2>
+        <div style={{ padding: '20px', border: '1px solid #2f3d23ff', borderRadius: '8px', maxWidth: '700px', margin: 'auto', background: '#466f23' }}>
+            <h2>Registro de Personas</h2><ImageDisplay offlineImageKey={data.imagenSelfie} tamaño={{ width: 60, height: 60, radius: true }} />
 
             {isSubmitted && (
                 <p style={{ color: 'green', fontWeight: 'bold' }}>✅ ¡Persona agregada y lista guardada!</p>
             )}
 
-            <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '10px', paddingBottom: '20px', borderBottom: '1px solid #eee' }}>
+            <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '10px', paddingBottom: '20px', /* borderBottom: '1px solid #eee' */ }}>
+
                 <label htmlFor="nombre">Nombre:</label>
                 <input type="text" id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} required />
 
@@ -121,8 +173,37 @@ const Forms = ({ cerrarForm, onAddPerson } = {}) => {
                     <option value="">Selecciona...</option>
                     <option value="femenino">Femenino</option>
                     <option value="masculino">Masculino</option>
-                    <option value="otro">Otro</option>
+                    <option value="noindica">no indica</option>
                 </select>
+
+                <label htmlFor="genero">Genero:</label>
+                <select id="genero" name="genero" value={formData.genero} onChange={handleChange} required>
+                    <option value="">Selecciona...</option>
+                    <option value="cisgenero">cisgenero</option>
+                    <option value="transgenero">transgenero</option>
+                    <option value="intersexual">intersexual</option>
+                    <option value="nobinario">no binario</option>
+                </select>
+
+                <label htmlFor="etnia">Etnia:</label>
+                <select id="etnia" name="etnia" value={formData.etnia} onChange={handleChange} required>
+                    <option value="">Selecciona...</option>
+                    <option value="qom">qom</option>
+                    <option value="pilagá">pilagá</option>
+                    <option value="mocoví">mocoví</option>
+                    <option value="wichí">wichí</option>
+                    <option value="guaraní">guaraní</option>
+                    <option value="avaguaraní">ava guaraní</option>
+                    <option value="chorote">chorote</option>
+                    <option value="ayoreo">ayoreo</option>
+                    <option value="sanapá">sanapá</option>
+                    <option value="lule">lule</option>
+                    <option value="vilela">vilela</option>
+                    <option value="criolla">criolla</option>
+                </select>
+
+                <label htmlFor="nfamilia">Número de integrantes familia:</label>
+                <input type="nfamilia" id="nfamilia" name="nfamilia" value={formData.nfamilia} onChange={handleChange} />
 
                 <label htmlFor="fechaNacimiento">Fecha de Nacimiento:</label>
                 <input type="date" id="fechaNacimiento" name="fechaNacimiento" value={formData.fechaNacimiento} onChange={handleChange} required />
@@ -136,25 +217,120 @@ const Forms = ({ cerrarForm, onAddPerson } = {}) => {
                     <option value="posgrado">Posgrado</option>
                 </select>
 
-                <label htmlFor="email">Email (opcional):</label>
-                <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} />
+                <label htmlFor="zona">Zona:</label>
+                <input type="text" id="zona" name="zona" value={formData.zona} onChange={handleChange} required />
 
-                <label htmlFor="telefono">Teléfono (opcional):</label>
-                <input type="tel" id="telefono" name="telefono" value={formData.telefono} onChange={handleChange} />
+                {/* Provincia */}
+                <label htmlFor="provincia">Provincia:</label>
+                <input type="text" id="provincia" name="provincia" value={formData.provincia} onChange={handleChange} required />
+
+                {/* Nivel */}
+                <label htmlFor="nivel">Nivel:</label>
+                <select id="nivel" name="nivel" value={formData.nivel} onChange={handleChange} required>
+                    <option value="">Selecciona...</option>
+                    {OPCIONES_NIVEL.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                </select>
+
+                {/* Superficie Predio */}
+                <label htmlFor="superficiePredio">Superficie predio (m2):</label>
+                <input
+                    type="number"
+                    id="superficiePredio"
+                    name="superficiePredio"
+                    value={formData.superficiePredio}
+                    onChange={handleChange}
+                    min="0"
+                    required
+                />
+
+                {/* Superficie Productiva */}
+                <label htmlFor="superficieProductiva">Superficie productiva (m2):</label>
+                <input
+                    type="number"
+                    id="superficieProductiva"
+                    name="superficieProductiva"
+                    value={formData.superficieProductiva}
+                    onChange={handleChange}
+                    min="0"
+                    required
+                />
+
+                {/* Productor (Multiple Choice - Checkboxes) */}
+                <label style={{ marginTop: '10px', fontWeight: 'bold' }}>Productor (selección múltiple):</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '5px' }}>
+                    {OPCIONES_PRODUCCION.map(opcion => (
+                        <div key={`prod-${opcion}`}>
+                            <input
+                                type="checkbox"
+                                id={`productor-${opcion}`}
+                                name="productor"
+                                value={opcion}
+                                // Usamos la nueva función para checkboxes
+                                onChange={handleCheckboxChange}
+                                checked={formData.productor.includes(opcion)}
+                            />
+                            <label htmlFor={`productor-${opcion}`} style={{ fontWeight: 'normal' }}>{opcion.charAt(0).toUpperCase() + opcion.slice(1)}</label>
+                        </div>
+                    ))}
+                </div>
+                {/* Despliega para completar "otros" */}
+                {formData.productor.includes('otros') && (
+                    <input
+                        type="text"
+                        name="productorOtro"
+                        placeholder="Especifica otro tipo de producción"
+                        value={formData.productorOtro}
+                        onChange={handleChange}
+                        required
+                    />
+                )}
+
+                {/* Interés en Capacitarse (Multiple Choice - Checkboxes) */}
+                <label style={{ marginTop: '10px', fontWeight: 'bold' }}>Interés en capacitarse (selección múltiple):</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '5px' }}>
+                    {OPCIONES_PRODUCCION.map(opcion => (
+                        <div key={`capa-${opcion}`}>
+                            <input
+                                type="checkbox"
+                                id={`capacitacion-${opcion}`}
+                                name="interesCapacitacion"
+                                value={opcion}
+                                // Usamos la nueva función para checkboxes
+                                onChange={handleCheckboxChange}
+                                checked={formData.interesCapacitacion.includes(opcion)}
+                            />
+                            <label htmlFor={`capacitacion-${opcion}`} style={{ fontWeight: 'normal' }}>{opcion.charAt(0).toUpperCase() + opcion.slice(1)}</label>
+                        </div>
+                    ))}
+                </div>
+                {/* Despliega para completar "otros" */}
+                {formData.interesCapacitacion.includes('otros') && (
+                    <input
+                        type="text"
+                        name="interesCapacitacionOtro"
+                        placeholder="Especifica el área de capacitación"
+                        value={formData.interesCapacitacionOtro}
+                        onChange={handleChange}
+                        required
+                    />
+                )}
 
                 <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
                     <button type="submit" style={{ padding: '10px 14px', background: '#2563eb', color: '#fff', borderRadius: 6, border: 'none', fontWeight: 700 }}>
                         Agregar Persona a la Lista
                     </button>
-                    <button type="button" onClick={() => { setFormData(initialFormData); if (typeof cerrarForm === 'function') cerrarForm(); }} style={{ padding: '10px 14px' }}>
+                    <button type="button" onClick={() => /* { setFormData(initialFormData); if (typeof cerrarForm === 'function') */ cerrarForm()/* ; } */} style={{ padding: '10px 14px' }}>
                         Cancelar
                     </button>
                 </div>
             </form>
-
+            <ImageDisplay offlineImageKey={data.imagenDNI} />
+            {/*
             <h3 style={{ marginTop: '20px' }}>Personas Registradas ({peopleList.length})</h3>
 
-            {peopleList.length === 0 ? (
+             {peopleList.length === 0 ? (
                 <p>Aún no hay personas registradas.</p>
             ) : (
                 peopleList.map((person, index) => (
@@ -170,7 +346,7 @@ const Forms = ({ cerrarForm, onAddPerson } = {}) => {
                 <pre style={{ backgroundColor: '#f4f4f4', padding: '10px', borderRadius: '4px', overflowX: 'auto' }}>
                     {JSON.stringify(peopleList, null, 2)}
                 </pre>
-            </details>
+            </details> */}
         </div>
     );
 };

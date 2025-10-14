@@ -8,11 +8,12 @@ import {
     loadModels,
 } from "./funciones/identityHash";
 import Forms from "./Forms";
+import { saveImageOffline } from "./funciones/offlineStore";
+import './Enrolamiento.css';
 
 /**
  * Enrolamiento + Verificación (estilizado)
  * - Mantiene la lógica que tenías.
- * - Añade estilos embebidos para que se vea bien sin Tailwind.
  * - Acepta prop opcional onEnroll(newPersonObject) -> para que el padre actualice peopleList.
  */
 
@@ -26,6 +27,7 @@ export default function Enrolamiento({ onEnroll } = {}) {
     const [storedHash, setStoredHash] = useState(null);
     const [lastDistance, setLastDistance] = useState(null);
     const [formulario, setFormulario] = useState(false);
+    const [data, setData] = useState({ imagenDNI: null, imagenSelfie: null });
 
     useEffect(() => {
         (async () => {
@@ -96,6 +98,26 @@ export default function Enrolamiento({ onEnroll } = {}) {
         // compute hash of raw buffer
         const hash = await sha256HexFromBuffer(descriptor.buffer);
 
+        //CAPTURAR Y GUARDAR IMAGEN DE MUESTRA OFFLINE (¡NUEVO!)
+        let offlineKey = null;
+        try {
+            // Convierte el canvas (que ya tiene la foto de la muestra) a un Blob
+            const imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+
+            // Guarda el Blob en IndexedDB y obtén la clave
+            offlineKey = await saveImageOffline(imageBlob);
+            setData(prevData => ({
+                ...prevData,
+                imagenSelfie: offlineKey,
+            }));
+
+        } catch (e) {
+            console.error("Error al capturar/guardar la imagen offline:", e);
+            alert("⚠️ Error crítico al guardar la imagen de la muestra offline. Enrolamiento cancelado.");
+            return;
+        }
+
+
         // Save into localStorage (PoC)
         localStorage.setItem("descriptor_b64", b64);
         localStorage.setItem("hashIdentidad", hash);
@@ -103,31 +125,7 @@ export default function Enrolamiento({ onEnroll } = {}) {
         setEnrolled(true);
         setStoredHash(hash);
 
-        // Si nos pasan onEnroll (función), construimos un objeto persona simple y lo enviamos
-        if (typeof onEnroll === "function") {
-            // construimos una persona mínima; el formulario puede completarla luego
-            const newPerson = {
-                nombre: "Sin Nombre",
-                apellido: "Sin Apellido",
-                sexo: "",
-                dni: "",
-                nivelEscolar: "",
-                fechaNacimiento: "",
-                email: "",
-                telefono: "",
-                id: Date.now(),
-                helperData: b64,
-                hashIdentidad: hash,
-            };
-            try {
-                onEnroll(newPerson);
-            } catch (e) {
-                console.warn("onEnroll prop lanzó error:", e);
-            }
-        }
-
         alert("Enrolamiento completado.\nidentityHash: " + hash);
-        setFormulario(true); // mostrar formulario después del enrolamiento
     }
 
     // VERIFICACIÓN: captura nueva muestra y compara con guardada
@@ -161,47 +159,52 @@ export default function Enrolamiento({ onEnroll } = {}) {
         let msg = `Matching result: ${ok ? "MATCH ✅" : "NO MATCH ❌"} (distance=${dist.toFixed(4)}, tol=${tolerance})\n`;
         msg += `Stored identityHash: ${storedHashLocal}\nRecomputed hash: ${recomputedHash}\n`;
         alert(msg);
+        //CAPTURAR Y GUARDAR IMAGEN DE MUESTRA OFFLINE (¡NUEVO!)
+        if (ok) {
+            let offlineKey = null;
+            try {
+                // Convierte el canvas (que ya tiene la foto de la muestra) a un Blob
+                const imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+
+                // Guarda el Blob en IndexedDB y obtén la clave
+                offlineKey = await saveImageOffline(imageBlob);
+                setData(prevData => ({
+                    ...prevData,
+                    imagenDNI: offlineKey,
+                }));
+                setFormulario(true);
+            } catch (e) {
+                console.error("Error al capturar/guardar la imagen offline:", e);
+                alert("⚠️ Error crítico al guardar la imagen de la muestra offline. Enrolamiento cancelado.");
+                return;
+            }
+        }
     }
 
     // borrar enrolamiento (debug)
-    function handleClearEnrollment() {
+    function handleClearEnrollment(alerta = false) {
         localStorage.removeItem("descriptor_b64");
         localStorage.removeItem("hashIdentidad");
         setEnrolled(false);
         setStoredHash(null);
         setLastDistance(null);
-        alert("Enrolamiento borrado localmente.");
+        if (alerta) alert("Enrolamiento borrado localmente.");
     }
 
     const cerrarForm = () => {
         setFormulario(false);
+        handleClearEnrollment();
+        setData({});
     };
 
     return (
         <div className="enrol-root">
-            <style>{`
-        :root{
-          --bg:#f7fafc; --card:#fff; --muted:#6b7280; --primary:#2563eb;
-          --text:#0f172a;
-        }
-        .enrol-root{width:100%;max-width:1100px;margin:0 auto;padding:18px;font-family:Inter,Arial,Helvetica,sans-serif}
-        .panel{display:flex;gap:20px;flex-wrap:wrap}
-        .video-card, .info-card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 8px 24px rgba(15,23,42,0.06)}
-        .video-card{flex:1;min-width:280px}
-        .info-card{flex:1;min-width:260px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
-        button{background:var(--primary);color:white;padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
-        button[disabled]{opacity:0.5;cursor:not-allowed}
-        .controls{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
-        .note{font-size:13px;color:var(--muted)}
-        .title{font-size:20px;font-weight:800;margin-bottom:6px}
-      `}</style>
-
             <h2 className="title">Enrolamiento y Verificación (PoC)</h2>
             <p className="note">{message}</p>
 
             {formulario ? (
                 <div className="video-card">
-                    <Forms cerrarForm={cerrarForm} />
+                    <Forms cerrarForm={cerrarForm} data={data} />
                 </div>
             ) : (
                 <div className="panel">

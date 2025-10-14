@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Enrolamiento from './Enrolamiento';
 import VerifyComponent from './VerifyComponent';
 import './App.css';
+import PeopleList from './PeopleList';
 
 // --- Función auxiliar para obtener peopleList desde Local Storage ---
 const getInitialPeople = () => {
@@ -13,36 +14,6 @@ const getInitialPeople = () => {
         return [];
     }
 };
-
-// --- PeopleList (estilos propios, sin Tailwind) ---
-const PeopleList = ({ peopleList }) => (
-    <div className="card">
-        <h2 className="card-title">Lista de Personas Registradas <span className="muted">({peopleList.length})</span></h2>
-
-        {peopleList.length === 0 ? (
-            <div className="alert warning">
-                Aún no hay personas registradas. ¡Ve a la pestaña de registro para agregar la primera!
-            </div>
-        ) : (
-            <div className="list">
-                {peopleList.map((person, index) => (
-                    <div key={person.id || index} className="list-item">
-                        <div className="person-main">
-                            <div className="person-name">{index + 1}. {person.nombre} {person.apellido}</div>
-                            <div className="person-dni">DNI: {person.dni || '-'}</div>
-                        </div>
-
-                        <div className="person-meta">
-                            <div>📅 {person.fechaNacimiento || '-'}</div>
-                            <div>🎓 {person.nivelEscolar || '-'}</div>
-                            <div>📧 {person.email || '-'}</div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        )}
-    </div>
-);
 
 // --- NotFound ---
 const NotFound = ({ path }) => (
