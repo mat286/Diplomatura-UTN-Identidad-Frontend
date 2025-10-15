@@ -3,6 +3,7 @@ import Enrolamiento from './Enrolamiento';
 import VerifyComponent from './VerifyComponent';
 import './App.css';
 import PeopleList from './PeopleList';
+import PersonDisplay from './PersonDisplay';
 
 // --- Función auxiliar para obtener peopleList desde Local Storage ---
 const getInitialPeople = () => {
@@ -52,6 +53,8 @@ export default function App() {
                 return <VerifyComponent />;
             case '/lista':
                 return <PeopleList peopleList={peopleList} />;
+            case '/ver':
+                return <PersonDisplay ipfsCid={"QmWZQ3SfbYxzFM3KPiuyZjwVKk3tdQtehxWRy1zNwfGcEQ"} encryptionKey={"f6dd8efeccb6464a26e5819c759a8e64aa50ad2877fc3a17720b4e59b043e91b"} />;
             default:
                 return <NotFound path={currentPath} />;
         }
@@ -81,6 +84,7 @@ export default function App() {
                         <Link to="/">🏡 Inicio</Link>
                         <Link to="/validar">✍️ Validar</Link>
                         <Link to="/lista">📋 Ver Lista ({peopleList.length})</Link>
+                        <Link to="/ver">Ver info de ipfs</Link>
                     </nav>
                 </div>
             </header>

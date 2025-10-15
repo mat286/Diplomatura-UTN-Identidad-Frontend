@@ -8,6 +8,8 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.12.2",
+    "crypto-js": "^4.2.0",
     "ethers": "^6.15.0",
     "face-api.js": "^0.22.2",
     "ipfs-http-client": "^60.0.1",

@@ -1,14 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as faceapi from "face-api.js";
 import {
-    float32ArrayToBase64,
     base64ToFloat32Array,
     sha256HexFromBuffer,
     euclideanDistance,
-    loadModels,
     base64ToUint8Array,
 } from "./funciones/identityHash";
 import './VerifyComponent.css'
+import { encryptAndPackage, decryptAndRetrieve, uploadToPinata } from "./funciones/encryptAndPackage";
 
 /**
  * VerifyComponent estilizado (sin dependencias CSS externas)
@@ -184,44 +183,53 @@ export default function VerifyComponent() {
         );
     }
 
+    async function empaquetar() {
+
+        if (selectedIdx === null) {
+            alert("Seleccioná una persona de la lista.");
+            return;
+        }
+        const person = people[selectedIdx];
+        if (!person.helperData) {
+            alert("La persona seleccionada no tiene helperData.");
+            return;
+        }
+        try {
+
+
+            // 1. Cifrar y empaquetar
+            /* const { encryptedData, encryptionKey } = await encryptAndPackage(person.offlineImageDNIKey, person.offlineImageKey, person);
+            console.log("Datos cifrados listos para subir."); */
+            /* console.log(person); */
+
+            /*  console.log(encryptedData, encryptionKey); */
+
+            // 2. Subir a IPFS (Pinata)
+            const { ipfsCid, encryptionKey } = await uploadToPinata(person);
+            console.log("Subido a IPFS (Pinata) con CID:", ipfsCid);
+            console.log("Calve:", encryptionKey);
+
+            // 3. Descargar y descifrar (prueba)
+            const dataposta = await decryptAndRetrieve(ipfsCid, encryptionKey);
+            console.log(dataposta.images, dataposta.json);
+            alert(`Proceso completado.\n\nCID en IPFS (Pinata): ${ipfsCid}\n\nRevisá consola para detalles.`);
+
+            /* const dataposta = await decryptAndRetrieve(encryptedData, encryptionKey);
+            console.log(dataposta.images, dataposta.json); */
+
+
+        } catch (error) {
+            console.error("Error en el proceso de subida:", error);
+            alert(`Error: ${error.message}`);
+        }
+        if (selectedIdx === null) {
+            alert("Seleccioná una persona de la lista.");
+            return;
+        }
+    }
+
     return (
         <div className="verify-root">
-            <style>{`
-        /* :root{
-          --bg:#f6f8fb; --card:#ffffff; --muted:#6b7280; --accent:#0ea5a4; --primary:#2563eb;
-        }
-        .verify-root{font-family:Inter,Arial,Helvetica,sans-serif;padding:18px;max-width:1100px;margin:0 auto}
-        .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-        .title{font-size:1.25rem;font-weight:800;color:#0f172a}
-        .status{font-size:0.95rem;color:var(--muted)}
-        .container{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
-        .left{width:360px;flex:0 0 360px}
-        .people-list{background:var(--card);padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(2,6,23,0.06);max-height:520px;overflow:auto}
-        .person-row{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;border:1px solid #eef2f7;margin-bottom:8px;cursor:pointer;transition:transform .12s,box-shadow .12s}
-        .person-row:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(2,6,23,0.06)}
-        .person-row.active{background:linear-gradient(90deg,#f8fafc,#ffffff);border-color:#dbeafe}
-        .person-left{display:flex;flex-direction:column}
-        .person-name{font-weight:700}
-        .person-dni{font-size:0.85rem;color:var(--muted)}
-        .person-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
-        .hash-preview{font-size:0.78rem;color:#9ca3af}
-        .right{flex:1;min-width:320px;display:flex;flex-direction:column;gap:12px}
-        .video-box{background:var(--card);padding:12px;border-radius:12px;box-shadow:0 8px 24px rgba(2,6,23,0.06)}
-        video{width:100%;height:auto;border-radius:8px;background:#000}
-        canvas{display:block;margin-top:8px;border-radius:8px;border:1px solid #eee;max-width:100%}
-        .controls{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-        button{padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:700;background:var(--primary);color:white}
-        button.secondary{background:#64748b}
-        button.negative{background:#ef4444}
-        .result-card{background:linear-gradient(180deg,#fff,#fbfdff);padding:10px;border-radius:10px;border:1px solid #eef2f7}
-        .result-ok{color:green;font-weight:800}
-        .result-fail{color:#b91c1c;font-weight:800}
-        .muted{color:var(--muted)}
-        @media (max-width:900px){
-          .container{flex-direction:column}
-          .left{width:100%;flex:1}
-        } */
-      `}</style>
 
             <div className="header">
                 <div>
@@ -259,6 +267,7 @@ export default function VerifyComponent() {
                             <button onClick={startCamera} disabled={cameraOn}>Iniciar cámara</button>
                             <button className="secondary" onClick={stopCamera} disabled={!cameraOn}>Detener</button>
                             <button onClick={handleVerify}>Capturar y Verificar</button>
+                            <button className="secondary" onClick={() => empaquetar(/* file1, file2, metadata */)}>Empauetar</button>
                         </div>
                     </div>
 
