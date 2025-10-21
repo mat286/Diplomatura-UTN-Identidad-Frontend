@@ -6,6 +6,7 @@ import axios from 'axios';
 // Para una aplicación de React, se acceden típicamente como process.env.REACT_APP_...
 const PINATA_API_KEY = process.env.REACT_APP_PINATA_API_KEY;
 const PINATA_SECRET_KEY = process.env.REACT_APP_PINATA_SECRET_KEY;
+const CLAVE_CRIPTO = process.env.REACT_APP_CLAVE_CRIPTO;
 const IPFS_GATEWAY = "https://gateway.pinata.cloud/ipfs/"; // Puedes usar cualquier gateway público
 
 
@@ -17,7 +18,7 @@ const IPFS_GATEWAY = "https://gateway.pinata.cloud/ipfs/"; // Puedes usar cualqu
  * @returns {Promise<{encryptedData: string, encryptionKey: string}>}
  */
 async function encryptAndPackage(imageFile1, imageFile2, jsonData) {
-    const encryptionKey = CryptoJS.lib.WordArray.random(256 / 8).toString();
+    /* const encryptionKey = CryptoJS.lib.WordArray.random(256 / 8).toString(); */
     const imageBlob1 = await getImagenBlob(imageFile1);
     const imageBlob2 = await getImagenBlob(imageFile2);
 
@@ -30,7 +31,7 @@ async function encryptAndPackage(imageFile1, imageFile2, jsonData) {
                     const arrayBuffer = e.target.result;
                     const wordArray = CryptoJS.lib.WordArray.create(arrayBuffer);
                     // Cifrar con AES
-                    const encrypted = CryptoJS.AES.encrypt(wordArray.toString(CryptoJS.enc.Hex), encryptionKey).toString();
+                    const encrypted = CryptoJS.AES.encrypt(wordArray.toString(CryptoJS.enc.Hex), /* encryptionKey */CLAVE_CRIPTO).toString();
                     resolve({
                         data: encrypted,
                         filename: file.name,
@@ -51,7 +52,7 @@ async function encryptAndPackage(imageFile1, imageFile2, jsonData) {
     ]);
 
     const jsonString = JSON.stringify(jsonData);
-    const jsonEncrypted = CryptoJS.AES.encrypt(jsonString, encryptionKey).toString();
+    const jsonEncrypted = CryptoJS.AES.encrypt(jsonString, /* encryptionKey */CLAVE_CRIPTO).toString();
 
     const packageData = {
         img1: img1Encrypted,
@@ -64,7 +65,7 @@ async function encryptAndPackage(imageFile1, imageFile2, jsonData) {
 
     return {
         encryptedData: JSON.stringify(packageData),
-        encryptionKey: encryptionKey,
+        encryptionKey: /* encryptionKey */CLAVE_CRIPTO,
     };
 }
 
@@ -120,7 +121,12 @@ async function uploadToPinata(person) {
  * @param {string} encryptionKey - La clave simétrica AES usada para cifrar el contenido.
  * @returns {Promise<{images: Array<{filename: string, dataUrl: string}>, json: Object}>}
  */
-async function decryptAndRetrieve(ipfsCid,/* data, */ encryptionKey) {
+async function decryptAndRetrieve(ipfsCid /* encryptionKey */) {
+
+    if (!CLAVE_CRIPTO) {
+        console.log(CLAVE_CRIPTO, process.env.REACT_APP_CLAVE_CRIPTO)
+        throw new Error("Claves de Pinata no configuradas en las variables de entorno.");
+    }
     // 1. Descargar el contenido cifrado de IPFS
     const url = `${IPFS_GATEWAY}${ipfsCid}`;
     const response = await axios.get(url);
@@ -129,7 +135,7 @@ async function decryptAndRetrieve(ipfsCid,/* data, */ encryptionKey) {
     // 2. Función auxiliar para descifrar y convertir a Blob
     const decryptFile = (encryptedFileData) => {
         // Descifrar el contenido
-        const decryptedHex = CryptoJS.AES.decrypt(encryptedFileData.data, encryptionKey).toString(CryptoJS.enc.Utf8);
+        const decryptedHex = CryptoJS.AES.decrypt(encryptedFileData.data, CLAVE_CRIPTO).toString(CryptoJS.enc.Utf8);
 
         // Convertir la cadena hexadecimal descifrada a un Array de Bytes
         const bytes = CryptoJS.enc.Hex.parse(decryptedHex);
@@ -154,7 +160,7 @@ async function decryptAndRetrieve(ipfsCid,/* data, */ encryptionKey) {
     const image2 = decryptFile(encryptedPackage.img2);
 
     // 4. Descifrar los datos JSON
-    const decryptedJsonString = CryptoJS.AES.decrypt(encryptedPackage.data, encryptionKey).toString(CryptoJS.enc.Utf8);
+    const decryptedJsonString = CryptoJS.AES.decrypt(encryptedPackage.data, CLAVE_CRIPTO).toString(CryptoJS.enc.Utf8);
     const decryptedJson = JSON.parse(decryptedJsonString);
 
     return {

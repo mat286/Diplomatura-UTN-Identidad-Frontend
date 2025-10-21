@@ -46,15 +46,26 @@ export default function App() {
 
     // Render de rutas simple
     const RoutesRenderer = () => {
-        switch (currentPath) {
+        const pathToCheck = currentPath;
+        const matchVer = pathToCheck.match(/^\/ver\/([a-zA-Z0-9_-]+)$/);
+
+        // 1. Lógica para la RUTA DINÁMICA
+        if (matchVer) {
+            // El parámetro capturado está en la posición [1] de la coincidencia
+            const ipfsCid = matchVer[1];
+
+            console.log("Parámetro CID extraído (RegExp):", ipfsCid);
+            return <PersonDisplay ipfsCid={ipfsCid} />;
+        }
+
+        // 2. Lógica para las RUTAS ESTÁTICAS
+        switch (pathToCheck) {
             case '/':
                 return <Enrolamiento setPeopleList={setPeopleList} peopleList={peopleList} />;
             case '/validar':
                 return <VerifyComponent />;
             case '/lista':
                 return <PeopleList peopleList={peopleList} />;
-            case '/ver':
-                return <PersonDisplay ipfsCid={"QmWZQ3SfbYxzFM3KPiuyZjwVKk3tdQtehxWRy1zNwfGcEQ"} encryptionKey={"f6dd8efeccb6464a26e5819c759a8e64aa50ad2877fc3a17720b4e59b043e91b"} />;
             default:
                 return <NotFound path={currentPath} />;
         }
@@ -84,7 +95,7 @@ export default function App() {
                         <Link to="/">🏡 Inicio</Link>
                         <Link to="/validar">✍️ Validar</Link>
                         <Link to="/lista">📋 Ver Lista ({peopleList.length})</Link>
-                        <Link to="/ver">Ver info de ipfs</Link>
+                        <Link to="/ver/QmWZQ3SfbYxzFM3KPiuyZjwVKk3tdQtehxWRy1zNwfGcEQ">Ver info de ipfs</Link>
                     </nav>
                 </div>
             </header>

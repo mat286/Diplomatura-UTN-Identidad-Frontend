@@ -35,14 +35,14 @@ const FIELD_MAP = {
 };
 
 
-function PersonDisplay({ ipfsCid, encryptionKey }) {
+function PersonDisplay({ ipfsCid/* , encryptionKey */ }) {
     const [personData, setPersonData] = useState(null);
     const [images, setImages] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     const fetchAndDecryptData = useCallback(async () => {
-        if (!ipfsCid || !encryptionKey) {
+        if (!ipfsCid /* || !encryptionKey */) {
             setError("Faltan el CID de IPFS o la Clave de Cifrado.");
             return;
         }
@@ -54,7 +54,7 @@ function PersonDisplay({ ipfsCid, encryptionKey }) {
 
         try {
             // Llama a la función de descifrado
-            const result = await decryptAndRetrieve(ipfsCid, encryptionKey);
+            const result = await decryptAndRetrieve(ipfsCid/* , encryptionKey */);
 
             // Filtramos las claves que no están en el mapa o son arrays vacíos, si es necesario
             const filteredData = Object.fromEntries(
@@ -76,7 +76,7 @@ function PersonDisplay({ ipfsCid, encryptionKey }) {
         } finally {
             setLoading(false);
         }
-    }, [ipfsCid, encryptionKey]);
+    }, [ipfsCid/* , encryptionKey */]);
 
     useEffect(() => {
         fetchAndDecryptData();
