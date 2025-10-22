@@ -1,0 +1,74 @@
+/* Variables de color */
+:root {
+    --dark-green: #384738;
+    /* Fondo más oscuro que la imagen anterior */
+    --button-green: #389e3c;
+    /* Color de los botones aproximado */
+    --white: #ffffff;
+}
+
+/* Contenedor principal de la pantalla */
+.menu-screen-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+    background-color: var(--dark-green);
+    padding: 40px 20px;
+    box-sizing: border-box;
+    gap: 40px;
+    /* Espacio entre los botones */
+}
+
+/* Estilo para cada botón de menú */
+.menu-button {
+    width: 100%;
+    max-width: 250px;
+    /* Ancho fijo para que luzca bien centrado */
+    height: 250px;
+    /* Alto igual para que sean cuadrados */
+    background-color: var(--button-green);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    /* Sombra sutil para darle profundidad */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.menu-button:hover {
+    background-color: #318a36;
+    /* Un poco más oscuro al pasar el ratón */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.menu-button:active {
+    transform: scale(0.98);
+    /* Efecto de "clic" */
+}
+
+/* Placeholder para el ícono (usando una fuente de íconos o un SVG real) */
+.icon-placeholder {
+    color: var(--white);
+    font-size: 5rem;
+    /* Tamaño grande para el ícono */
+    margin-bottom: 15px;
+    /* Si usas un SVG, asegúrate de que el SVG se redimensione bien */
+}
+
+/* Estilo del texto del botón */
+.button-text {
+    color: var(--white);
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}

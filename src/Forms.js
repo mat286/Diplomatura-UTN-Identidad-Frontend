@@ -63,7 +63,7 @@ const OPCIONES_NIVEL = [
 
 
 
-const Forms = ({ cerrarForm, onAddPerson, data } = {}) => {
+const Forms = ({ cerrarForm, onAddPerson, data, onFormCompleted } = {}) => {
     // Estado para la nueva persona
     const [formData, setFormData] = useState(initialFormData);
 
@@ -119,12 +119,13 @@ const Forms = ({ cerrarForm, onAddPerson, data } = {}) => {
         // limpiar formulario y mostrar mensaje
         setFormData(initialFormData);
         setIsSubmitted(true);
+        onFormCompleted(newPerson);
 
         // cerrar el formulario después de un corto delay (igual que antes)
-        setTimeout(() => {
+        /* setTimeout(() => {
             setIsSubmitted(false);
             if (typeof cerrarForm === 'function') cerrarForm();
-        }, 1200);
+        }, 1200); */
     };
 
 
