@@ -5,7 +5,10 @@ import { useNavigate } from 'react-router-dom';
 // Componente para el botón reutilizable
 const MenuButton = ({ iconPlaceholder, text, onClick }) => (
     <button className="menu-button" onClick={onClick}>
-        <div className="icon-placeholder">{iconPlaceholder}</div>
+        <div className="icon-placeholder">
+            <img src={iconPlaceholder} />
+        </div>
+
         <span className="button-text">{text}</span>
     </button>
 );
@@ -22,14 +25,14 @@ const MenuScreen = ({ onNavigate }) => {
         <div className="menu-screen-container">
             <MenuButton
                 // Placeholder del ícono de Huella Dactilar
-                iconPlaceholder="" // Usando un carácter de ícono Unicode si no se usa una librería como FontAwesome
+                iconPlaceholder="./identidad.png" // Usando un carácter de ícono Unicode si no se usa una librería como FontAwesome
                 text="IDENTIDADES"
                 onClick={() => handleLogin('/captura-foto')}
             />
 
             <MenuButton
                 // Placeholder del ícono de Clase/Enseñanza
-                iconPlaceholder="" // Usando un carácter de ícono Unicode si no se usa una librería como FontAwesome
+                iconPlaceholder="./clases.png" // Usando un carácter de ícono Unicode si no se usa una librería como FontAwesome
                 text="CLASES"
                 onClick={() => handleLogin('clases')}
             />

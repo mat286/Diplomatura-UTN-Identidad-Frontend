@@ -8,9 +8,12 @@ import {
     loadModels,
 } from "../funciones/identityHash";
 import Forms from "../Forms";
-import { saveImageOffline } from "../funciones/offlineStore";
+import { DeleteImageOffline, saveImageOffline } from "../funciones/offlineStore";
 import './Enrolamiento2.css';
 import { useNavigate } from "react-router-dom";
+import { decryptAndRetrieve, uploadToPinata } from "../funciones/encryptAndPackage";
+import LoadingSpinner from '../LoadingSpinner';
+import { crearIdentidad } from "../funciones/sendContractTransaction";
 
 // --- CONSTANTES DEL FLUJO ---
 const CAPTURE_STATUS = {
@@ -42,6 +45,8 @@ export default function Enrolamiento() {
 
     const [step, setStep] = useState(FLOW_STEPS.BIOMETRIC_SELFIE);
     const [captureStatus, setCaptureStatus] = useState(CAPTURE_STATUS.CAPTURING);
+
+    const [isLoading, setIsLoading] = useState(false);
 
     const [dniImageKey, setDniImageKey] = useState(null);
     // Simulo 4 huellas registradas para el mensaje final
@@ -131,6 +136,8 @@ export default function Enrolamiento() {
         localStorage.removeItem("hashIdentidad");
         setEnrolled(false);
         setStoredHash(null);
+        DeleteImageOffline(data.imagenSelfie);
+        DeleteImageOffline(data.imagenDNI);
         setStep(FLOW_STEPS.BIOMETRIC_SELFIE);
         setData({ imagenSelfie: null, imagenDNI: null, formData: {} });
         setDniImageKey(null);
@@ -309,20 +316,59 @@ export default function Enrolamiento() {
         setMessage("¡Registro Completo!");
     }
 
+    async function empaquetar() {
 
-    // --- RENDERS DE VISTA ---
+        if (data === null) {
+            alert("Problema con la informacion.");
+            return;
+        }
+        const person = data.formData;
+        if (!person.helperData) {
+            alert("La persona seleccionada no tiene helperData.");
+            return;
+        }
+        setIsLoading(true);
+        try {
+
+            // 2. Subir a IPFS (Pinata)
+            const { ipfsCid, encryptionKey } = await uploadToPinata(person);
+            console.log("Subido a IPFS (Pinata) con CID:", ipfsCid);
+            console.log("Calve:", encryptionKey);
+
+            // 3. Descargar y descifrar (prueba)
+            const dataposta = await decryptAndRetrieve(ipfsCid, encryptionKey);
+            console.log(dataposta.images, dataposta.json);
+            alert(`Proceso completado.\n\nCID en IPFS (Pinata): ${ipfsCid}\n\nRevisá consola para detalles.`);
+
+            await crearIdentidad(person.hashIdentidad, ipfsCid);
+
+
+            setIsLoading(false);
+            handleClearEnrollment(false);
+
+
+        } catch (error) {
+            setIsLoading(false);
+            console.error("Error en el proceso de subida:", error);
+            alert(`Error: ${error.message}`);
+        }
+    }
+
+
+
+    // ------------------------------------------------------ RENDERS DE VISTA -----------------------------------------------
 
     const renderSelfieCapture = () => (
         <div className="video-card">
             <div className="instructions-box">
-                <span>📸</span> Por favor, toma una **selfie** para la biometría. (Paso 1 de 3)
+                <span>📸</span> Por favor, toma una **foto** para la biometría. (Paso 1 de 3)
             </div>
 
             <div className="capture-area">
                 {step === FLOW_STEPS.SELFIE_COMPLETE ? (
                     <>
                         <div className="capture-icon-container completed">✓</div>
-                        <p className="capture-text">Foto Selfie capturada <br /> Biometría registrada</p>
+                        <p className="capture-text">Foto capturada <br /> Biometría registrada</p>
                     </>
                 ) : (
                     <video ref={videoRef} autoPlay muted className="video-preview" style={{ opacity: modelsLoaded ? 1 : 0 }} />
@@ -393,7 +439,12 @@ export default function Enrolamiento() {
         <div className="video-card">
             <div className="fingerprint-area">
                 <div className="fingerprint-icon">
-                    {step === FLOW_STEPS.FINGERPRINT_COMPLETE ? "✓" : "🖐️"}
+                    {step === FLOW_STEPS.FINGERPRINT_COMPLETE ? "✓" :
+
+                        <div style={{ background: '#4A9B7F', borderRadius: 9999, border: '4px #F5F9F7 solid' }} >
+                            <img style={{ width: '100%', height: '100%' }} src="./huella.png" />
+                        </div>
+                    }
                 </div>
                 <p className="fingerprint-message">
                     {step === FLOW_STEPS.FINGERPRINT_COMPLETE
@@ -463,7 +514,7 @@ export default function Enrolamiento() {
 
                 <h4 style={{ marginTop: '15px' }}>Resumen del registro:</h4>
                 <ul className="checklist">
-                    <li> {data.formData.hashIdentidad.slice(0, 12) + "..."}</li>
+                    <li> {data.formData?.hashIdentidad.slice(0, 12) + "..."}</li>
                     <li>✓ Datos personales verificados ({Object.keys(data.formData).length > 0 ? 'Completado' : 'Pendiente'})</li>
                     <li>✓ Captura biométrica facial ({data.imagenSelfie ? 'Registrada' : 'Faltante'})</li>
                     <li>✓ huella digitales registradas</li>
@@ -471,8 +522,8 @@ export default function Enrolamiento() {
                 </ul>
             </div>
 
-            <button className="btn-export">
-                <span style={{ marginRight: '8px', fontSize: '1.2em' }}>⬇️</span> Publicar Datos <br /> {data.formData.hashIdentidad.slice(0, 12) + "..."}
+            <button className="btn-export" onClick={empaquetar}>
+                <span style={{ marginRight: '8px', fontSize: '1.2em' }}>⬇️</span> Publicar Datos <br /> {data.formData?.hashIdentidad.slice(0, 12) + "..."}
             </button>
             <p className="final-small-text">Compatible con estándares Web3 y DLT</p>
 
@@ -490,18 +541,25 @@ export default function Enrolamiento() {
     // --- RENDER PRINCIPAL (Switcher) ---
     return (
         <div className="enrol-root">
-            <p className="note">{message}</p>
+            {isLoading ? (
+                // Puedes pasar un mensaje personalizado o usar el predeterminado
+                <LoadingSpinner message="Subiendo..." />
+            ) : (
+                <>
+                    <p className="note">{message}</p>
 
-            {/* --- Flujo Biométrico --- */}
-            {(step === FLOW_STEPS.BIOMETRIC_SELFIE || step === FLOW_STEPS.SELFIE_COMPLETE) && renderSelfieCapture()}
-            {(step === FLOW_STEPS.DNI_CAPTURE || step === FLOW_STEPS.DNI_COMPLETE) && renderDniCapture()}
-            {(step === FLOW_STEPS.FINGERPRINT || step === FLOW_STEPS.FINGERPRINT_COMPLETE) && renderFingerprint()}
+                    {/* --- Flujo Biométrico --- */}
+                    {(step === FLOW_STEPS.BIOMETRIC_SELFIE || step === FLOW_STEPS.SELFIE_COMPLETE) && renderSelfieCapture()}
+                    {(step === FLOW_STEPS.DNI_CAPTURE || step === FLOW_STEPS.DNI_COMPLETE) && renderDniCapture()}
+                    {(step === FLOW_STEPS.FINGERPRINT || step === FLOW_STEPS.FINGERPRINT_COMPLETE) && renderFingerprint()}
 
-            {/* --- Formulario --- */}
-            {step === FLOW_STEPS.FORM && renderForm()}
+                    {/* --- Formulario --- */}
+                    {step === FLOW_STEPS.FORM && renderForm()}
 
-            {/* --- Finalizado --- */}
-            {step === FLOW_STEPS.FINAL_SAVED && renderFinalSaved()}
+                    {/* --- Finalizado --- */}
+                    {step === FLOW_STEPS.FINAL_SAVED && renderFinalSaved()}
+                </>
+            )}
         </div>
     );
 }
