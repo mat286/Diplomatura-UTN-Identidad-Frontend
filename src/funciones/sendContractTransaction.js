@@ -280,10 +280,12 @@ export async function crearIdentidad(hashIdentidad, ipfsCID) {
         const receipt = await tx.wait();
         console.log("✅ Identidad creada y transacción confirmada en el bloque:", receipt.blockNumber);
 
+
         return receipt;
 
     } catch (error) {
         console.error("❌ Error al crear la identidad:", error.message || error);
         alert(`Fallo en la transacción: ${error.message || "Verifica la consola para más detalles."}`);
+        return { success: false, error: error.message || "Error desconocido" };
     }
 }

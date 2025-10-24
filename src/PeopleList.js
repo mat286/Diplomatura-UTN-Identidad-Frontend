@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ImageDisplay from "./ImageDisplay";
+import "./PeopleList.css";
 
 
 // --- Función auxiliar para obtener peopleList desde Local Storage ---

@@ -1,0 +1,197 @@
+/* Paleta de Colores
+    --key-protocol-green: #38733a; (El verde principal, como el botón 'CONTINUAR')
+    --key-protocol-dark: #e8f5e9; (El fondo claro del elemento de lista)
+    --key-protocol-light-dark: #253a1a; (El gris/verde oscuro de la tarjeta principal)
+    --key-protocol-secondary-green: #5cb85c;
+    --key-protocol-text-light: #000000; (Texto oscuro para elementos de lista)
+    --key-protocol-text-on-dark: #ffffff; (Texto blanco para la tarjeta principal oscura)
+    --key-protocol-text-muted: #aaaaaa;
+    --key-protocol-error: #d9534f;
+*/
+
+:root {
+    --key-protocol-green: #38733a;
+    --key-protocol-dark: #e8f5e9;
+    --key-protocol-light-dark: #253a1a;
+    --key-protocol-secondary-green: #5cb85c;
+    --key-protocol-text-light: #000000;
+    --key-protocol-text-on-dark: #ffffff;
+    /* Nueva variable para texto sobre el fondo oscuro */
+    --key-protocol-text-muted: #aaaaaa;
+    --key-protocol-error: #d9534f;
+}
+
+
+/* ----------------------------------------------------------------
+   ESTILOS GENERALES DEL CONTENEDOR PRINCIPAL
+   ---------------------------------------------------------------- */
+
+.card {
+    /* Ajuste para responsividad: Usamos margin: auto con un margen en los lados */
+    background-color: var(--key-protocol-light-dark);
+    color: var(--key-protocol-text-on-dark);
+    /* Usar blanco para el texto de la tarjeta oscura */
+    border-radius: 12px;
+    padding: 25px;
+    /* margin: 20px 15px; */
+    /* Añadimos margen lateral de 15px para móviles */
+    max-width: 600px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-sizing: border-box;
+    /* Asegura que el padding se incluya en el ancho total */
+}
+
+.card-title {
+    color: var(--key-protocol-text-on-dark);
+    /* Aseguramos que sea blanco */
+    font-size: 1.5em;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 20px;
+    /* Opacidad reducida en el borde para que se vea sobre el fondo oscuro */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 10px;
+}
+
+.card-title .muted {
+    color: var(--key-protocol-green);
+    font-weight: 300;
+    font-size: 0.8em;
+}
+
+/* ----------------------------------------------------------------
+   ESTILOS DE LA LISTA DE PERSONAS
+   ---------------------------------------------------------------- */
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.list-item {
+    background-color: var(--key-protocol-dark);
+    color: var(--key-protocol-text-light);
+    /* Usar color de texto oscuro */
+    padding: 15px;
+    border-radius: 8px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    /* Borde sutil oscuro */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.list-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Sección principal de la persona (Nombre e Imagen) */
+.person-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    /* Borde de división más sutil */
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.person-name {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--key-protocol-text-light);
+    flex-grow: 1;
+    padding-right: 10px;
+}
+
+/* Sección de metadatos (DNI, Fecha, Nivel) */
+.person-meta {
+    display: grid;
+    /* El valor minmax(100px, 1fr) permite que cada columna tenga un mínimo de 100px
+       y se adapte al espacio restante */
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px 15px;
+    font-size: 0.9em;
+    color: var(--key-protocol-text-muted);
+}
+
+.person-meta>div {
+    display: flex;
+    align-items: center;
+}
+
+/* DNI con un poco más de énfasis */
+.person-dni {
+    font-weight: 600;
+    color: var(--key-protocol-green);
+}
+
+/* ----------------------------------------------------------------
+   ESTILOS DE ALERTA
+   ---------------------------------------------------------------- */
+
+.alert {
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 500;
+    text-align: center;
+    margin-top: 15px;
+    border: 1px solid;
+}
+
+.alert.warning {
+    background-color: #fff3cd;
+    /* Color de fondo claro para advertencia */
+    color: #856404;
+    /* Color de texto oscuro para advertencia */
+    border-color: #ffeeba;
+}
+
+/* ================================================================
+   MEDIA QUERIES PARA RESPONSIVIDAD (Móviles y Tablets)
+   ================================================================ */
+
+/* Ajustes para pantallas pequeñas (ej. teléfonos, hasta 480px) */
+@media (max-width: 480px) {
+
+    /* 1. Reducir el padding de la tarjeta y el margen lateral */
+    .card {
+        padding: 20px 15px;
+       /*  margin: 15px 10px; */
+        /* Margen lateral reducido */
+    }
+
+    /* 2. Disposición vertical para los metadatos */
+    .person-meta {
+        /* Fuerza a que los metadatos se muestren en dos columnas o una única lista vertical */
+        grid-template-columns: 1fr;
+        /* Una columna por defecto */
+        font-size: 0.85em;
+        /* Fuente ligeramente más pequeña */
+        gap: 5px;
+        /* Espaciado vertical reducido */
+    }
+
+    /* 3. Reducir el tamaño de fuente del nombre */
+    .person-name {
+        font-size: 1.1em;
+    }
+}
+
+/* Ajustes para tabletas o vista entre 481px y 768px */
+@media (min-width: 481px) and (max-width: 768px) {
+    .card {
+        margin: 25px auto;
+        /* Centrar la tarjeta, con margen en la parte superior/inferior */
+        width: 90%;
+    }
+
+    /* Ajuste fino para los metadatos en tabletas */
+    .person-meta {
+        /* Permite de 2 a 3 columnas para aprovechar el espacio */
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+}

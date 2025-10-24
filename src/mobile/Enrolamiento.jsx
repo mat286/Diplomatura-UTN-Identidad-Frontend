@@ -14,6 +14,8 @@ import { useNavigate } from "react-router-dom";
 import { decryptAndRetrieve, uploadToPinata } from "../funciones/encryptAndPackage";
 import LoadingSpinner from '../LoadingSpinner';
 import { crearIdentidad } from "../funciones/sendContractTransaction";
+import { Transaction } from "ethers";
+import TransactionLogs from "./TransactionLogs";
 
 // --- CONSTANTES DEL FLUJO ---
 const CAPTURE_STATUS = {
@@ -30,6 +32,7 @@ const FLOW_STEPS = {
     FINGERPRINT_COMPLETE: 'fingerprint_complete', // 6. Huella aceptada (listo para Form)
     FORM: 'form',                           // 7. Formulario (Forms.js)
     FINAL_SAVED: 'final_saved',             // 8. Proceso Terminado
+    RESULTADO_FINAL: 'resultado_final',     // 9. Resultado final (éxito)
 }
 
 export default function Enrolamiento() {
@@ -58,6 +61,7 @@ export default function Enrolamiento() {
         imagenDNI: null,
         formData: {}
     });
+    const [transactionData, setTransactionData] = useState({});
 
     // --- EFECTOS (Lifecycle) ---
 
@@ -144,6 +148,7 @@ export default function Enrolamiento() {
         /* setFingerprintCount(0); */ // Reiniciar el contador de huellas
         setCaptureStatus(CAPTURE_STATUS.CAPTURING); // Volver a modo cámara
         setMessage("Modelos cargados ✅. Listo para nuevo enrolamiento.");
+        if (alerta) updatePeopleList(null, data.formData); // guarsa los datos previos de forma local
         if (alerta) alert("Flujo de enrolamiento reiniciado.");
     }
 
@@ -316,6 +321,31 @@ export default function Enrolamiento() {
         setMessage("¡Registro Completo!");
     }
 
+    const updatePeopleList = (ipfsCid, person) => {
+        if (!person /* || !ipfsCid */) {
+            console.error("Los datos de persona o ipfsCid son incompletos.");
+            return JSON.parse(savedPeople) || []; // o retornar solo []
+        }
+        const savedPeople = localStorage.getItem('peopleList');
+        try {
+            const lista = savedPeople ? JSON.parse(savedPeople) : [];
+            lista.push({
+                apellido: person.apellido,
+                nombre: person.nombre,
+                fechaNacimiento: person.fechaNacimiento,
+                dni: person.dni,
+                helperData: person.helperData,
+                hashIdentidad: person.hashIdentidad,
+                ipfsCID: ipfsCid,
+            });
+            localStorage.setItem('peopleList', JSON.stringify(lista));
+            return lista;
+        } catch (error) {
+            console.error("Error al parsear 'peopleList' del Local Storage:", error);
+            return [];
+        }
+    };
+
     async function empaquetar() {
 
         if (data === null) {
@@ -340,12 +370,25 @@ export default function Enrolamiento() {
             console.log(dataposta.images, dataposta.json);
             alert(`Proceso completado.\n\nCID en IPFS (Pinata): ${ipfsCid}\n\nRevisá consola para detalles.`);
 
-            await crearIdentidad(person.hashIdentidad, ipfsCid);
-
+            const result = await crearIdentidad(person.hashIdentidad, ipfsCid);
+            if (result.success === false) {
+                setIsLoading(false);
+                console.log(updatePeopleList(ipfsCid, person)); // Ya se mostró el error en crearIdentidad
+                handleClearEnrollment(false);
+            } else {
+                console.log("Identidad creada en blockchain con éxito.");
+                setTransactionData({
+                    account: result.from || "0x0",
+                    hash: result.hash || "0x0",
+                    blockHash: result.blockHash || "0",
+                    block: result.blockNumber || "0",
+                    status: result.success ? "success" : "error"
+                });
+                console.log(result);
+                setStep(FLOW_STEPS.RESULTADO_FINAL);
+            }
 
             setIsLoading(false);
-            handleClearEnrollment(false);
-
 
         } catch (error) {
             setIsLoading(false);
@@ -538,6 +581,25 @@ export default function Enrolamiento() {
     );
 
 
+    const renderFinal = () => (
+        <div className="final-screen-card">
+            {/* <div className="final-icon-container">
+                <div className="final-icon">✓</div>
+            </div>
+            <h2>¡Registro Completo!</h2> */}
+            <TransactionLogs transactionData={transactionData} />
+
+            <button
+                className="btn-secondary"
+                onClick={() => handleClearEnrollment(true)}
+                style={{ marginTop: '20px', fontWeight: 'bold' }}
+            >
+                CARGAR A OTRA PERSONA
+            </button>
+        </div>
+    );
+
+
     // --- RENDER PRINCIPAL (Switcher) ---
     return (
         <div className="enrol-root">
@@ -558,6 +620,9 @@ export default function Enrolamiento() {
 
                     {/* --- Finalizado --- */}
                     {step === FLOW_STEPS.FINAL_SAVED && renderFinalSaved()}
+
+                    {/* --- Finalizado --- */}
+                    {step === FLOW_STEPS.RESULTADO_FINAL && renderFinal()}
                 </>
             )}
         </div>

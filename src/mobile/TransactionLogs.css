@@ -1,0 +1,160 @@
+/* Estilos para el componente TransactionLogs.jsx */
+
+.log-container {
+    max-width: 700px;
+    /* Ajuste para móvil: usamos margen lateral para evitar que toque los bordes */
+    margin: 40px auto;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    background-color: #ffffff;
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+    /* Asegura que el padding no cause desbordamiento */
+}
+
+.log-header {
+    font-size: 1.5em;
+    color: #333;
+    border-bottom: 2px solid #38733a;
+    /* Verde Protocolo */
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.log-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.log-item {
+    display: flex;
+    align-items: flex-start;
+    /* Se ajusta a flex-start para manejar múltiples líneas en móvil */
+    justify-content: space-between;
+    padding: 8px 15px;
+    border-radius: 6px;
+    background-color: #f7f7f7;
+    transition: background-color 0.3s;
+}
+
+.log-item:hover {
+    background-color: #f0f0f0;
+}
+
+/* Estilo para mensajes de éxito */
+.log-item.success,
+.log-item.final {
+    background-color: #e6ffe6;
+    /* Fondo verde claro */
+    border-left: 5px solid #38733a;
+    /* Borde verde oscuro */
+    font-weight: 600;
+}
+
+.log-icon {
+    font-size: 1.2em;
+    margin-right: 10px;
+    /* Para que el ícono no cambie de línea en móvil */
+    flex-shrink: 0;
+}
+
+.log-message {
+    flex-grow: 1;
+    color: #555;
+    /* Permite que el hash se divida en varias líneas si es necesario */
+    word-break: break-all;
+    min-width: 0;
+    /* Necesario para que flexbox respete word-break */
+}
+
+/* Estilo para los enlaces de Etherscan */
+.log-link {
+    color: #38733a;
+    /* Verde Protocolo */
+    text-decoration: none;
+    font-size: 0.9em;
+    padding: 2px 5px;
+    border-radius: 3px;
+    transition: color 0.3s;
+    /* Mantenemos nowrap en escritorio */
+    white-space: nowrap;
+    margin-left: 10px;
+    /* Separación del mensaje */
+    flex-shrink: 0;
+    /* Evita que el enlace se encoja */
+}
+
+.log-link:hover {
+    text-decoration: underline;
+    color: #2b552d;
+}
+
+/* Resumen de la Transacción */
+.transaction-summary {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+    font-size: 0.9em;
+}
+
+.transaction-summary p {
+    margin: 0;
+    color: #333;
+}
+
+.transaction-summary a {
+    color: #38733a;
+    font-weight: 600;
+    /* Permite el quiebre de línea en el hash largo en el resumen */
+    word-break: break-all;
+}
+
+
+/* ================================================================
+   MEDIA QUERY PARA PANTALLAS MÓVILES (hasta 600px)
+   ================================================================ */
+
+@media (max-width: 600px) {
+
+    /* Ajuste de margen para el contenedor principal en pantallas pequeñas */
+    .log-container {
+        margin: 15px 10px;
+        padding: 15px;
+    }
+
+    /* Redefinimos el log-item para apilar el mensaje y el enlace */
+    .log-item {
+        /* Cambiamos la dirección para que los elementos se apilen verticalmente (o envuelvan) */
+        flex-wrap: wrap;
+        padding: 10px;
+    }
+
+    /* El mensaje ocupa el ancho completo para dar espacio */
+    .log-message {
+        width: 100%;
+        margin-bottom: 5px;
+        /* Pequeño espacio entre el mensaje y el enlace */
+    }
+
+    /* Hacemos que el enlace se alinee a la izquierda y use el ancho completo debajo del mensaje */
+    .log-link {
+        width: 100%;
+        margin-left: 0;
+        text-align: left;
+        /* Estilo como un botón pequeño para que sea más fácil de tocar */
+        display: block;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        padding: 5px 10px;
+    }
+
+    .log-item.success .log-link,
+    .log-item.final .log-link {
+        background-color: #d1ffd1;
+        /* Fondo de enlace que coincida con el éxito */
+        border-color: #38733a;
+    }
+}
