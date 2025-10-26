@@ -4,10 +4,9 @@ import { useNavigate } from 'react-router-dom';
 
 const KeyProtocolScreen = () => {
 
-    const navigate = useNavigate(); // <--- Usa el hook internamente
+    const navigate = useNavigate();
 
     const handleLogin = () => {
-        // En lugar de llamar a una prop, navega directamente:
         navigate('/menu');
     };
 
@@ -17,7 +16,7 @@ const KeyProtocolScreen = () => {
                 <img
                     src="/logo.png"
                     alt="Key Protocol Logo"
-                    className="icon-image" // Agregamos una clase para estilizarlo
+                    className="icon-image"
                 />
 
                 <h1 className="protocol-title">KEY</h1>
@@ -27,7 +26,7 @@ const KeyProtocolScreen = () => {
                 </p>
             </div>
 
-            <button className="technician-button" onClick={handleLogin}> {/* Llama a la función */}
+            <button className="technician-button" onClick={handleLogin}>
                 TECNICO
             </button>
         </div>

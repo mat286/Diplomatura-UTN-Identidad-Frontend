@@ -6,7 +6,6 @@
     justify-content: center;
     padding: 20px;
     background-color: #f4f4f4;
-    /* Fondo claro */
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -16,17 +15,12 @@
 /* Estilo del "Spinner" (el círculo giratorio) */
 .spinner {
     border: 4px solid rgba(0, 0, 0, 0.1);
-    /* Color base del círculo */
     border-top: 4px solid #3498db;
-    /* Color de la parte que se mueve (azul) */
     border-radius: 50%;
-    /* Lo convierte en un círculo */
     width: 40px;
     height: 40px;
     animation: spin 1s linear infinite;
-    /* Aplica la animación 'spin' */
     margin-bottom: 15px;
-    /* Espacio entre el spinner y el mensaje */
 }
 
 /* Animación para hacer que el spinner gire */

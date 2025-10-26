@@ -247,4 +247,4 @@ const PhotoCaptureScreen = () => {
     );
 };
 
-export default PhotoCaptureScreen;
+/* export default PhotoCaptureScreen; */

@@ -1,11 +1,5 @@
 import React from 'react';
 
-/**
- * Componente de presentación (UI) para la captura de foto y confirmación.
- * @param {boolean} isCaptured - Si es true, muestra la confirmación; si es false, muestra la cámara.
- * @param {function} onRecapture - Handler para el botón "Tomar Otra Foto".
- * ... (otras props se mantienen)
- */
 const PhotoCaptureUI = ({
     videoRef,
     canvasRef,
@@ -14,23 +8,20 @@ const PhotoCaptureUI = ({
     onBack,
     message,
     captureDisabled,
-    isCaptured,      // <--- NUEVA PROP
-    onRecapture      // <--- NUEVA PROP
+    isCaptured,
+    onRecapture 
 }) => {
 
     // Contenido del área central que cambia
     const centralContent = isCaptured ? (
-        // --- VISTA DE CONFIRMACIÓN (Foto Capturada) ---
         <div className="confirmation-content">
             <div className="check-circle">
-                {/* Ícono de Visto Bueno (Checkmark) */}
                 <span className="check-icon" role="img" aria-label="visto bueno">✓</span>
             </div>
             <p className="status-title">Foto capturada</p>
             <p className="status-subtitle">Biometría registrada</p>
         </div>
     ) : (
-        // --- VISTA DE CÁMARA (Vista Previa) ---
         <div className="camera-placeholder">
             <video ref={videoRef} autoPlay muted className="camera-video" />
             {message && (
@@ -47,7 +38,6 @@ const PhotoCaptureUI = ({
             className="recapture-button"
             onClick={onRecapture}
         >
-            {/* Ícono de Recargar/Volver a Tomar */}
             <span className="recapture-icon" role="img" aria-label="volver a tomar">&#8635;</span>
             TOMAR OTRA FOTO
         </button>

@@ -1,19 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ImageDisplay from './ImageDisplay';
 
-/**
- * Forms - Formulario para añadir personas
- *
- * Props:
- *  - cerrarForm: function() -> se llama cuando querés cerrar el formulario
- *  - onAddPerson: optional function(newPerson) -> si está provista, Forms llamará a esta función
- *                 en lugar de gestionar su propio peopleList/localStorage.
- *
- * Behavior:
- *  - Si onAddPerson no se provee, Forms mantiene su propio peopleList en localStorage (comportamiento legacy).
- *  - Si onAddPerson existe, Forms delega la adición al padre y NO sobrescribe peopleList en localStorage.
- */
-
 // Función auxiliar para obtener el array de personas desde Local Storage 
 const getInitialPeople = () => {
     const savedPeople = localStorage.getItem('peopleList');
@@ -64,18 +51,13 @@ const OPCIONES_NIVEL = [
 
 
 const Forms = ({ cerrarForm, onAddPerson, data, onFormCompleted } = {}) => {
-    // Estado para la nueva persona
     const [formData, setFormData] = useState(initialFormData);
-
-    // Si onAddPerson no existe, mantenemos peopleList localmente
     const [peopleList, setPeopleList] = useState(getInitialPeople);
-
-    // Estado para controlar el mensaje de éxito
     const [isSubmitted, setIsSubmitted] = useState(false);
 
     // Guardar en localStorage sólo si NO hay onAddPerson (modo autónomo)
     useEffect(() => {
-        if (typeof onAddPerson === 'function') return; // delegamos al padre
+        if (typeof onAddPerson === 'function') return;
         localStorage.setItem('peopleList', JSON.stringify(peopleList));
     }, [peopleList, onAddPerson]);
 
@@ -98,7 +80,7 @@ const Forms = ({ cerrarForm, onAddPerson, data, onFormCompleted } = {}) => {
             id: Date.now(),
             helperData,
             hashIdentidad,
-            offlineImageKey: data.imagenSelfie || null, // data provista por el padre (offlineKey)
+            offlineImageKey: data.imagenSelfie || null,
             offlineImageDNIKey: data.imagenDNI || null,
         };
 
@@ -108,11 +90,9 @@ const Forms = ({ cerrarForm, onAddPerson, data, onFormCompleted } = {}) => {
                 onAddPerson(newPerson);
             } catch (err) {
                 console.error('onAddPerson lanzó un error:', err);
-                // fallback: guardar localmente si falla
                 setPeopleList(prev => [...prev, newPerson]);
             }
         } else {
-            // comportamiento legacy: guardamos localmente
             setPeopleList(prevList => [...prevList, newPerson]);
         }
 
@@ -120,29 +100,18 @@ const Forms = ({ cerrarForm, onAddPerson, data, onFormCompleted } = {}) => {
         setFormData(initialFormData);
         setIsSubmitted(true);
         onFormCompleted(newPerson);
-
-        // cerrar el formulario después de un corto delay (igual que antes)
-        /* setTimeout(() => {
-            setIsSubmitted(false);
-            if (typeof cerrarForm === 'function') cerrarForm();
-        }, 1200); */
     };
 
 
     // Asumiendo que Forms.js tiene acceso a esta función
     const handleCheckboxChange = (event) => {
         const { name, value, checked } = event.target;
-
-        // Si el campo no existe o no es un array, se usa la lógica estándar
-        // Aquí es donde ajustas el formData (si usas useState, sería setFormData)
         if (checked) {
-            // Añadir el valor si está marcado
             setFormData(prevData => ({
                 ...prevData,
                 [name]: [...prevData[name], value],
             }));
         } else {
-            // Eliminar el valor si está desmarcado
             setFormData(prevData => ({
                 ...prevData,
                 [name]: prevData[name].filter(v => v !== value),
@@ -158,7 +127,7 @@ const Forms = ({ cerrarForm, onAddPerson, data, onFormCompleted } = {}) => {
                 <p style={{ color: 'green', fontWeight: 'bold' }}>✅ ¡Persona agregada y lista guardada!</p>
             )}
 
-            <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '10px', paddingBottom: '20px', /* borderBottom: '1px solid #eee' */ }}>
+            <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '10px', paddingBottom: '20px' }}>
 
                 <label htmlFor="nombre">Nombre:</label>
                 <input type="text" id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} required />
@@ -268,7 +237,6 @@ const Forms = ({ cerrarForm, onAddPerson, data, onFormCompleted } = {}) => {
                                 id={`productor-${opcion}`}
                                 name="productor"
                                 value={opcion}
-                                // Usamos la nueva función para checkboxes
                                 onChange={handleCheckboxChange}
                                 checked={formData.productor.includes(opcion)}
                             />
@@ -298,7 +266,6 @@ const Forms = ({ cerrarForm, onAddPerson, data, onFormCompleted } = {}) => {
                                 id={`capacitacion-${opcion}`}
                                 name="interesCapacitacion"
                                 value={opcion}
-                                // Usamos la nueva función para checkboxes
                                 onChange={handleCheckboxChange}
                                 checked={formData.interesCapacitacion.includes(opcion)}
                             />
@@ -322,32 +289,12 @@ const Forms = ({ cerrarForm, onAddPerson, data, onFormCompleted } = {}) => {
                     <button type="submit" style={{ padding: '10px 14px', background: '#2563eb', color: '#fff', borderRadius: 6, border: 'none', fontWeight: 700 }}>
                         Agregar Persona a la Lista
                     </button>
-                    <button type="button" onClick={() => /* { setFormData(initialFormData); if (typeof cerrarForm === 'function') */ cerrarForm()/* ; } */} style={{ padding: '10px 14px' }}>
+                    <button type="button" onClick={() => cerrarForm()} style={{ padding: '10px 14px' }}>
                         Cancelar
                     </button>
                 </div>
             </form>
             <ImageDisplay offlineImageKey={data.imagenDNI} />
-            {/*
-            <h3 style={{ marginTop: '20px' }}>Personas Registradas ({peopleList.length})</h3>
-
-             {peopleList.length === 0 ? (
-                <p>Aún no hay personas registradas.</p>
-            ) : (
-                peopleList.map((person, index) => (
-                    <div key={person.id || index} style={{ border: '1px dashed #ccc', padding: '10px', marginBottom: '8px', borderRadius: '4px' }}>
-                        <p><strong>{index + 1}. {person.nombre} {person.apellido}</strong> (DNI: {person.dni})</p>
-                        <p style={{ fontSize: '0.9em', margin: '2px 0' }}>Nacimiento: {person.fechaNacimiento} | Nivel: {person.nivelEscolar}</p>
-                    </div>
-                ))
-            )}
-
-            <details style={{ marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '10px' }}>
-                <summary>Ver array completo en Local Storage (JSON)</summary>
-                <pre style={{ backgroundColor: '#f4f4f4', padding: '10px', borderRadius: '4px', overflowX: 'auto' }}>
-                    {JSON.stringify(peopleList, null, 2)}
-                </pre>
-            </details> */}
         </div>
     );
 };

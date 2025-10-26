@@ -5,29 +5,19 @@
 */
 :root {
     --color-fondo-oscuro: #384738;
-    /* Fondo más neutro oscuro */
     --color-card-fondo: #2E453A;
-    /* Verde oscuro para los contenedores */
     --color-verde-principal: #4CAF50;
-    /* Verde brillante (CONTINUAR) */
     --color-verde-secundario: #4a9b7f;
-    /* Verde oscuro para Capturar Foto */
     --color-verde-hover: #43A047;
     --color-texto-claro: #F5F5F5;
     --color-texto-secundario: #B0B0B0;
     --color-borde-input: #4CAF50;
     --color-icono-borde: #E8F5E9;
-    /* Verde muy claro para el borde del icono */
     --color-check-fondo: #E0F2E4;
-    /* Fondo del área de la foto capturada */
     --color-check-icono: #4CAF50;
-    /* Color del check */
     --color-btn-tomar-otra: #E8F5E9;
-    /* Color de fondo de "Tomar Otra Foto" */
     --color-btn-tomar-otra-texto: #4a9b7f;
-    /* Color de texto de "Tomar Otra Foto" */
     --color-resumen-fondo: #f0f8f0;
-    /* Fondo del cuadro "Datos Protegidos" */
     --color-resumen-borde: #dcece2;
 }
 
@@ -43,7 +33,6 @@ body {
     background-color: var(--color-fondo-oscuro);
     display: flex;
     flex-direction: column;
-    /* Cambiado a columna para centrar mejor el contenido */
     justify-content: flex-start;
     align-items: center;
     min-height: 100vh;
@@ -93,7 +82,6 @@ body {
 
 /* Área de Cámara/Captura */
 .capture-area {
-    /* **IMPORTANTE: Altura definida para que el video pueda llenarla** */
     background-color: var(--color-check-fondo);
     border-radius: 12px;
     padding: 20px;
@@ -104,10 +92,8 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 350px;
-    /* Aumentado para mejor visualización */
     position: relative;
     overflow: hidden;
-    /* Asegura que el video se recorte al borde */
 }
 
 /* Fix para el video: ocupa el 100% y cubre el área */
@@ -135,12 +121,10 @@ body {
     color: var(--color-verde-principal);
     margin-bottom: 10px;
     position: relative;
-    /* Para que esté por encima del video/fondo */
     z-index: 10;
 }
 
 .capture-icon-container.completed {
-    /* Mantenemos el estilo de completado */
     background-color: #F8FDF9;
     border-color: var(--color-verde-principal);
     color: var(--color-verde-principal);
@@ -257,7 +241,6 @@ button {
     width: 90%;
     max-width: 400px;
     background-color: var(--color-fondo-oscuro);
-    /* Se ajusta al fondo para el efecto de la imagen */
     padding: 0 20px;
     border-radius: 12px;
     display: flex;
@@ -300,7 +283,6 @@ button {
 /* Caja de "Datos Protegidos" (simula el contenedor interno de la imagen) */
 .data-protected-box {
     background-color: var(--color-resumen-fondo);
-    /* Verde muy claro */
     color: #333;
     padding: 20px;
     border-radius: 10px;

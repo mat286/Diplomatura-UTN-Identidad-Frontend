@@ -1,11 +1,7 @@
 import { ethers } from "ethers";
 
-// ⚠️ REEMPLAZA ESTOS VALORES
 const CONTRACT_ADDRESS = "0xb86bdcf91acba3ab2fccacbaf50a3ce6c1c56d5c"; // La dirección de tu contrato desplegado
-// Usa la ABI definida arriba o la completa de Remix
-/* const CONTRACT_ABI = [
-    "function createId(bytes32 _hashIdentidad, string memory _ipfsCID) public"
-]; */
+
 const CONTRACT_ABI = [
     {
         "inputs": [
@@ -226,13 +222,11 @@ async function getSepoliaSigner() {
                 params: [{ chainId: SEPOLIA_CHAIN_ID_HEX }],
             });
 
-            // ⚠️ CLAVE: Después de un cambio exitoso, re-inicializamos el provider
-            // y obtenemos la nueva red y el signer.
+            
             provider = new ethers.BrowserProvider(window.ethereum);
             network = await provider.getNetwork();
 
             if (network.chainId !== SEPOLIA_CHAIN_ID) {
-                // Esto solo debería ocurrir si el usuario cancela la solicitud de cambio
                 throw new Error("Por favor, cambia manualmente tu wallet a la red Sepolia y vuelve a intentar.");
             }
             console.log("Cambio de red completado con éxito a Sepolia.");
@@ -256,7 +250,6 @@ async function getSepoliaSigner() {
 
 export async function crearIdentidad(hashIdentidad, ipfsCID) {
     try {
-        // ... (Tu validación de hashIdentidad) ...
         if (!hashIdentidad.startsWith("0x") || hashIdentidad.length !== 66) {
             throw new Error("El hash de identidad debe ser un string hexadecimal de 66 caracteres (incluyendo '0x').");
         }

@@ -1,15 +1,6 @@
 import React from 'react';
 import './TransactionLogs.css';
 
-// --- Datos Fijos de Ejemplo (Tomados de tu imagen) ---
-const transactionData = {
-    account: "0xd855A114CBa38d41905861daFe1b5829aefa89CC",
-    hash: "0xace117a9166d507371415edela4b80d6aa01a27657ceb1b44c854f0484524f26",
-    block: "9482487",
-    status: "success" // O 'pending', 'error'
-};
-
-
 const ETHERSCAN_URL = "https://sepolia.etherscan.io";
 
 // --- Componente principal ---
@@ -64,13 +55,10 @@ const TransactionLogs = ({ transactionData }) => {
             <div className="log-list">
                 {logs.map((log) => (
                     <div key={log.id} className={`log-item ${log.status} ${log.highlight ? 'highlight' : ''}`}>
-                        {/* Icono (si existe) */}
                         {log.icon && <span className="log-icon">{log.icon}</span>}
 
-                        {/* Mensaje del Log */}
                         <span className="log-message">{log.message}</span>
 
-                        {/* Enlace a Etherscan (si existe) */}
                         {log.link && (
                             <a
                                 href={log.link}

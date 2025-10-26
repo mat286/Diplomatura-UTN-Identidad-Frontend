@@ -1,9 +1,6 @@
-/* Variables para facilitar la gestión de colores */
 :root {
     --dark-green: #29472e;
-    /* Color de fondo aproximado */
     --button-green: #388e3c;
-    /* Color del botón aproximado */
     --white: #ffffff;
 }
 
@@ -12,14 +9,11 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    /* Para empujar el botón hacia abajo */
     align-items: center;
     min-height: 100vh;
-    /* O la altura que desees para el componente */
     width: 100%;
     background-color: var(--dark-green);
     padding: 40px 20px;
-    /* Padding superior e inferior para el contenido */
     box-sizing: border-box;
 }
 
@@ -30,19 +24,14 @@
     align-items: center;
     text-align: center;
     margin-top: 10vh;
-    /* Ajusta este valor para centrar verticalmente mejor el texto principal */
     flex-grow: 1;
-    /* Permite que esta sección ocupe el espacio extra */
 }
 
 /* Estilos para la imagen del icono SVG */
 .icon-image {
     width: 300px;
-    /* Ancho del icono */
     height: auto;
-    /* Mantener la proporción del SVG */
     max-height: 500px;
-    /* Alto máximo, si el original es más alto */
     margin-bottom: 20px;
 }
 
@@ -50,25 +39,21 @@
 .protocol-title {
     color: var(--white);
     font-size: 3.5rem;
-    /* Ajusta el tamaño de fuente */
     font-weight: 900;
     margin: 0;
     line-height: 1;
     letter-spacing: 5px;
-    /* Espaciado entre letras */
 }
 
 /* Subtítulo "protocol" */
 .protocol-subtitle {
     color: var(--white);
     font-size: 2.5rem;
-    /* Tamaño de fuente más pequeño que KEY */
     font-weight: 500;
     margin: 0;
     line-height: 1.2;
     letter-spacing: 2px;
     text-transform: lowercase;
-    /* Se ve en minúscula o minúsculas */
 }
 
 /* Texto de descripción */
@@ -76,18 +61,14 @@
     color: var(--white);
     font-size: 1rem;
     font-weight: 300;
-    /* Letras delgadas */
     margin-top: 15px;
     opacity: 0.8;
-    /* Para el color grisáceo que se ve */
 }
 
 /* Botón TECNICO */
 .technician-button {
     width: 90%;
-    /* Ancho que se ajusta a la pantalla, se puede poner fijo también */
     max-width: 400px;
-    /* Para que no se estire demasiado en pantallas grandes */
     padding: 18px 0;
     background-color: var(--button-green);
     color: var(--white);
@@ -99,12 +80,10 @@
     cursor: pointer;
     transition: background-color 0.3s;
     margin-bottom: 40px;
-    /* Espacio desde la parte inferior */
 }
 
 .technician-button:hover {
     background-color: #38a042;
-    /* Un tono un poco más claro al pasar el ratón */
 }
 
 /* Estilos adicionales para un mejor look en móvil (opcional) */

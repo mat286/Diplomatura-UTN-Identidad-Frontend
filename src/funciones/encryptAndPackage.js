@@ -2,12 +2,10 @@ import CryptoJS from 'crypto-js';
 import { deletePersonFromLocalStorage, getImagenBlob } from './offlineStore';
 import axios from 'axios';
 
-// Las claves API y Secretas deben estar en variables de entorno (ej. .env.local)
-// Para una aplicación de React, se acceden típicamente como process.env.REACT_APP_...
 const PINATA_API_KEY = process.env.REACT_APP_PINATA_API_KEY;
 const PINATA_SECRET_KEY = process.env.REACT_APP_PINATA_SECRET_KEY;
 const CLAVE_CRIPTO = process.env.REACT_APP_CLAVE_CRIPTO;
-const IPFS_GATEWAY = "https://gateway.pinata.cloud/ipfs/"; // Puedes usar cualquier gateway público
+const IPFS_GATEWAY = "https://gateway.pinata.cloud/ipfs/"; 
 
 
 /**
@@ -18,7 +16,6 @@ const IPFS_GATEWAY = "https://gateway.pinata.cloud/ipfs/"; // Puedes usar cualqu
  * @returns {Promise<{encryptedData: string, encryptionKey: string}>}
  */
 async function encryptAndPackage(imageFile1, imageFile2, jsonData) {
-    /* const encryptionKey = CryptoJS.lib.WordArray.random(256 / 8).toString(); */
     const imageBlob1 = await getImagenBlob(imageFile1);
     const imageBlob2 = await getImagenBlob(imageFile2);
 
@@ -52,7 +49,7 @@ async function encryptAndPackage(imageFile1, imageFile2, jsonData) {
     ]);
 
     const jsonString = JSON.stringify(jsonData);
-    const jsonEncrypted = CryptoJS.AES.encrypt(jsonString, /* encryptionKey */CLAVE_CRIPTO).toString();
+    const jsonEncrypted = CryptoJS.AES.encrypt(jsonString, CLAVE_CRIPTO).toString();
 
     const packageData = {
         img1: img1Encrypted,
@@ -65,7 +62,7 @@ async function encryptAndPackage(imageFile1, imageFile2, jsonData) {
 
     return {
         encryptedData: JSON.stringify(packageData),
-        encryptionKey: /* encryptionKey */CLAVE_CRIPTO,
+        encryptionKey: CLAVE_CRIPTO,
     };
 }
 
@@ -76,7 +73,6 @@ async function encryptAndPackage(imageFile1, imageFile2, jsonData) {
  * @returns {Promise<string>} - El Content ID (CID) de IPFS.
  */
 async function uploadToPinata(person) {
-    // 1. Cifrar y empaquetar los datos (ya hecho antes de llamar a esta función)
     const { encryptedData, encryptionKey } = await encryptAndPackage(person.offlineImageDNIKey, person.offlineImageKey, person);
     console.log("Datos cifrados listos para subir.");
 
@@ -93,7 +89,6 @@ async function uploadToPinata(person) {
     };
 
     const pinataBody = {
-        // Pinata requiere un objeto JSON, no solo un string
         pinataContent: JSON.parse(encryptedData),
         pinataMetadata: {
             name: `Encrypted_Data_${Date.now()}.json`
@@ -102,9 +97,8 @@ async function uploadToPinata(person) {
 
     try {
         const response = await axios.post(url, pinataBody, { headers });
-        //esto elimina  la informacion local
         deletePersonFromLocalStorage(person.hashIdentidad);
-        return { ipfsCid: response.data.IpfsHash, encryptionKey: encryptionKey }; // Retorna el CID de IPFS
+        return { ipfsCid: response.data.IpfsHash, encryptionKey: encryptionKey }; 
     } catch (error) {
         console.error("Error subiendo a Pinata:", error.response ? error.response.data : error.message);
         throw new Error("Fallo al subir a IPFS (Pinata).");
@@ -121,7 +115,7 @@ async function uploadToPinata(person) {
  * @param {string} encryptionKey - La clave simétrica AES usada para cifrar el contenido.
  * @returns {Promise<{images: Array<{filename: string, dataUrl: string}>, json: Object}>}
  */
-async function decryptAndRetrieve(ipfsCid /* encryptionKey */) {
+async function decryptAndRetrieve(ipfsCid) {
 
     if (!CLAVE_CRIPTO) {
         console.log(CLAVE_CRIPTO, process.env.REACT_APP_CLAVE_CRIPTO)
@@ -130,11 +124,10 @@ async function decryptAndRetrieve(ipfsCid /* encryptionKey */) {
     // 1. Descargar el contenido cifrado de IPFS
     const url = `${IPFS_GATEWAY}${ipfsCid}`;
     const response = await axios.get(url);
-    const encryptedPackage = response.data; // Es el objeto JSON que subimos
+    const encryptedPackage = response.data; 
 
     // 2. Función auxiliar para descifrar y convertir a Blob
     const decryptFile = (encryptedFileData) => {
-        // Descifrar el contenido
         const decryptedHex = CryptoJS.AES.decrypt(encryptedFileData.data, CLAVE_CRIPTO).toString(CryptoJS.enc.Utf8);
 
         // Convertir la cadena hexadecimal descifrada a un Array de Bytes
@@ -153,7 +146,6 @@ async function decryptAndRetrieve(ipfsCid /* encryptionKey */) {
             dataUrl: dataUrl,
         };
     };
-    /* const objeto = JSON.parse(encryptedPackage); */
 
     // 3. Descifrar imágenes
     const image1 = decryptFile(encryptedPackage.img1);
@@ -168,7 +160,5 @@ async function decryptAndRetrieve(ipfsCid /* encryptionKey */) {
         json: decryptedJson,
     };
 }
-
-/* export { decryptAndRetrieve }; */
 
 export { encryptAndPackage, decryptAndRetrieve, uploadToPinata };

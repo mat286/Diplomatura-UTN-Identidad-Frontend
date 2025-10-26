@@ -1,13 +1,9 @@
 /* Variables para los colores principales */
 :root {
     --dark-green: #29472e;
-    /* Fondo principal (igual) */
     --continue-green: #386d3d;
-    /* Color de botón CONTINUAR (igual) */
     --capture-green: #59a67f;
-    /* Color del botón CAPTURAR FOTO (igual) */
     --alert-bg-light: #e6f0e6;
-    /* Fondo de la alerta superior (igual) */
     --white: #ffffff;
 }
 
@@ -20,37 +16,29 @@
     width: 100%;
     background-color: var(--dark-green);
     padding: 0;
-    /* Eliminamos el padding principal */
     box-sizing: border-box;
-    /* El espaciado se manejará con márgenes de los elementos internos */
 }
 
 /* 1. Alerta de iluminación (Ahora va sobre el área de la cámara) */
 .illumination-alert {
-    /* Ocupa el ancho máximo del contenedor central */
     width: 90%;
     max-width: 400px;
-    /* Ancho máximo para pantallas grandes */
 
     background-color: var(--alert-bg-light);
     color: var(--dark-green);
     border-radius: 8px;
     padding: 10px 15px;
-    /* Reducimos el padding vertical */
 
     display: flex;
     align-items: center;
     position: absolute;
-    /* Colocamos sobre el área de la cámara */
     top: 30px;
-    /* Separación de arriba */
     z-index: 10;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .camera-icon-small {
     font-size: 1.2rem;
-    /* Más pequeño que antes */
     margin-right: 10px;
 }
 
@@ -64,12 +52,10 @@
 /* 2. Área de previsualización de la cámara (la imagen grande) */
 .camera-preview-area {
     width: 100%;
-    /* Ocupa todo el espacio entre la alerta (conceptual) y el botón de captura */
     flex-grow: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    /* El color de fondo solo se ve si no hay stream de cámara */
     background-color: #8bb892;
     position: relative;
 }
@@ -85,24 +71,17 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* Asegura que el video cubra el contenedor sin estirarse */
 }
 
-/* ESTILOS ELIMINADOS: Se elimina 'camera-circle', 'camera-icon-large' y 'placeholder-text'
-   que simulaban la vista previa, ya que ahora usamos el <video> real.
-*/
 
 /* 3. Botón de Capturar Foto */
 .capture-button {
     width: 100%;
-    /* Ocupa el ancho completo */
     padding: 18px 0;
-    /* Más alto que el botón de navegación */
     background-color: var(--capture-green);
     color: var(--white);
     border: none;
     border-radius: 0;
-    /* Quitamos bordes redondeados */
     font-size: 1.2rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -111,7 +90,6 @@
     justify-content: center;
     align-items: center;
     gap: 10px;
-    /* Se coloca inmediatamente debajo de la cámara */
     margin: 0;
     box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
     z-index: 5;
@@ -125,9 +103,6 @@
 .navigation-buttons-group {
     width: 100%;
     max-width: 400px;
-    /* Mantenemos este max-width para los botones inferiores */
-    /* Reemplazamos margin-top: auto; y padding-bottom: 20px;
-     por un fondo y padding directo en este contenedor para que se vea el fondo oscuro */
     background-color: var(--dark-green);
     padding: 15px 20px 30px 20px;
     box-sizing: border-box;
@@ -161,14 +136,12 @@
     color: var(--continue-green);
 }
 
-/* ... (Todo el CSS que te pasé en la respuesta anterior) ... */
 
 /* Estilo para el elemento de video */
 .camera-video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* Clave para que la imagen de la cámara cubra todo sin distorsión */
 }
 
 /* Capa de mensaje superpuesta (si el video falla o para mostrar el estado de carga) */
@@ -179,7 +152,6 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.4);
-    /* Fondo semi-transparente */
     color: white;
     display: flex;
     justify-content: center;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getImageObjectURL } from './funciones/offlineStore'; // Importa la nueva función
+import { getImageObjectURL } from './funciones/offlineStore';
 
 // Asume que este componente recibe la clave de la imagen
 function ImageDisplay({ offlineImageKey, tamaño = { width: "100%", height: "auto", radius: false } }) {
@@ -12,7 +12,7 @@ function ImageDisplay({ offlineImageKey, tamaño = { width: "100%", height: "aut
         const loadAndDisplayImage = async () => {
             const url = await getImageObjectURL(offlineImageKey);
             if (url) {
-                currentObjectURL = url; // Guarda la referencia para revocar
+                currentObjectURL = url; 
                 setImageUrl(url);
             }
         };
@@ -27,11 +27,10 @@ function ImageDisplay({ offlineImageKey, tamaño = { width: "100%", height: "aut
         return () => {
             if (currentObjectURL) {
                 console.log("Revocando URL de Objeto:", currentObjectURL);
-                // ¡Paso CRÍTICO! Libera la memoria ocupada por el Blob.
                 URL.revokeObjectURL(currentObjectURL);
             }
         };
-    }, [offlineImageKey]); // Se ejecuta cuando la clave de la imagen cambia
+    }, [offlineImageKey]);
 
     if (!imageUrl) {
         return <div>Cargando imagen de muestra...</div>;
@@ -39,7 +38,6 @@ function ImageDisplay({ offlineImageKey, tamaño = { width: "100%", height: "aut
 
     return (
         <div>
-            {/* <p>Muestra Facial (Guardada Offline)</p> */}
             <img
                 src={imageUrl}
                 alt="Muestra de Enrolamiento Offline"

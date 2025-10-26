@@ -59,14 +59,4 @@ async function loadModels() {
     ]);
 }
 
-/* async function loadModels() {
-    const MODELS_BASE = "https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights";
-    await Promise.all([
-        faceapi.nets.tinyFaceDetector.loadFromUri(MODELS_BASE),
-        faceapi.nets.faceLandmark68Net.loadFromUri(MODELS_BASE),
-        faceapi.nets.faceRecognitionNet.loadFromUri(MODELS_BASE),
-    ]);
-} */
-
-
 export { base64ToUint8Array, float32ArrayToBase64, base64ToFloat32Array, sha256HexFromBuffer, euclideanDistance, loadModels }

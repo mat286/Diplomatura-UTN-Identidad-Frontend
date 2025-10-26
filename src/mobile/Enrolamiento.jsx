@@ -7,15 +7,16 @@ import {
     euclideanDistance,
     loadModels,
 } from "../funciones/identityHash";
-import Forms from "../Forms";
+
 import { DeleteImageOffline, saveImageOffline } from "../funciones/offlineStore";
-import './Enrolamiento2.css';
-import { useNavigate } from "react-router-dom";
 import { decryptAndRetrieve, uploadToPinata } from "../funciones/encryptAndPackage";
-import LoadingSpinner from '../LoadingSpinner';
 import { crearIdentidad } from "../funciones/sendContractTransaction";
-import { Transaction } from "ethers";
+
+import Forms from "../Forms";
+import LoadingSpinner from '../LoadingSpinner';
 import TransactionLogs from "./TransactionLogs";
+
+import './Enrolamiento2.css';
 
 // --- CONSTANTES DEL FLUJO ---
 const CAPTURE_STATUS = {
@@ -24,21 +25,20 @@ const CAPTURE_STATUS = {
 };
 
 const FLOW_STEPS = {
-    BIOMETRIC_SELFIE: 'biometric_selfie',   // 1. Captura de Selfie
-    SELFIE_COMPLETE: 'selfie_complete',     // 2. Selfie tomada (Listo para DNI)
-    DNI_CAPTURE: 'dni_capture',             // 3. Captura de DNI
-    DNI_COMPLETE: 'dni_complete',           // 4. Foto de DNI aceptada
-    FINGERPRINT: 'fingerprint',             // 5. Captura de Huella
+    BIOMETRIC_SELFIE: 'biometric_selfie',         // 1. Captura de Selfie
+    SELFIE_COMPLETE: 'selfie_complete',           // 2. Selfie tomada (Listo para DNI)
+    DNI_CAPTURE: 'dni_capture',                   // 3. Captura de DNI
+    DNI_COMPLETE: 'dni_complete',                 // 4. Foto de DNI aceptada
+    FINGERPRINT: 'fingerprint',                   // 5. Captura de Huella
     FINGERPRINT_COMPLETE: 'fingerprint_complete', // 6. Huella aceptada (listo para Form)
-    FORM: 'form',                           // 7. Formulario (Forms.js)
-    FINAL_SAVED: 'final_saved',             // 8. Proceso Terminado
-    RESULTADO_FINAL: 'resultado_final',     // 9. Resultado final (éxito)
+    FORM: 'form',                                 // 7. Formulario 
+    FINAL_SAVED: 'final_saved',                   // 8. Proceso Terminado
+    RESULTADO_FINAL: 'resultado_final',           // 9. Resultado final (éxito)
 }
 
 export default function Enrolamiento() {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
-    const navigate = useNavigate();
 
     // --- ESTADOS ---
     const [modelsLoaded, setModelsLoaded] = useState(false);
@@ -52,9 +52,6 @@ export default function Enrolamiento() {
     const [isLoading, setIsLoading] = useState(false);
 
     const [dniImageKey, setDniImageKey] = useState(null);
-    // Simulo 4 huellas registradas para el mensaje final
-    /* const [fingerprintCount, setFingerprintCount] = useState(0); */
-    /* const isFingerprintCaptured = fingerprintCount > 0; */
 
     const [data, setData] = useState({
         imagenSelfie: null,
@@ -62,8 +59,6 @@ export default function Enrolamiento() {
         formData: {}
     });
     const [transactionData, setTransactionData] = useState({});
-
-    // --- EFECTOS (Lifecycle) ---
 
     // 1. Carga de modelos
     useEffect(() => {
@@ -123,7 +118,6 @@ export default function Enrolamiento() {
     }, [modelsLoaded, step]);
 
     // --- HELPERS Y LÓGICA DE NEGOCIO ---
-
     function drawVideoFrameToCanvas() {
         const video = videoRef.current;
         const canvas = canvasRef.current;
@@ -145,7 +139,6 @@ export default function Enrolamiento() {
         setStep(FLOW_STEPS.BIOMETRIC_SELFIE);
         setData({ imagenSelfie: null, imagenDNI: null, formData: {} });
         setDniImageKey(null);
-        /* setFingerprintCount(0); */ // Reiniciar el contador de huellas
         setCaptureStatus(CAPTURE_STATUS.CAPTURING); // Volver a modo cámara
         setMessage("Modelos cargados ✅. Listo para nuevo enrolamiento.");
         if (alerta) updatePeopleList(null, data.formData); // guarsa los datos previos de forma local
@@ -157,8 +150,7 @@ export default function Enrolamiento() {
         handleClearEnrollment(true);
     };
 
-    // --- PASO 1: CAPTURA DE SELFIE BIOMÉTRICA (BIOMETRIC_SELFIE) ---
-
+    // --- CAPTURA DE SELFIE BIOMÉTRICA (BIOMETRIC_SELFIE) ---
     async function handleCapturePhoto() {
         if (!modelsLoaded) return alert("Modelos no cargados");
         setMessage("Detectando rostro...");
@@ -217,8 +209,7 @@ export default function Enrolamiento() {
         }
     }
 
-    // --- PASO 3: CAPTURA DNI (DNI_CAPTURE) ---
-
+    // --- CAPTURA DNI (DNI_CAPTURE) ---
     async function handleDniCapture() {
         if (!modelsLoaded) return alert("Modelos no cargados");
         setMessage("Capturando DNI y validando rostro...");
@@ -289,32 +280,20 @@ export default function Enrolamiento() {
     }
 
 
-    // --- PASO 5: HUELLA DIGITAL (FINGERPRINT) ---
-
+    // --- HUELLA DIGITAL (FINGERPRINT) ---
     const handleFingerprintCapture = () => {
-        // Simulación: incrementa la cuenta de huellas hasta 4
-        /* if (fingerprintCount < 4) {
-            setFingerprintCount(prev => prev + 1);
-            setMessage(`Huella #${fingerprintCount + 1} aceptada. Faltan ${4 - (fingerprintCount + 1)}.`);
-        } */
-
         setStep(FLOW_STEPS.FINGERPRINT_COMPLETE);
         setMessage("¡Todas las huellas registradas! ✅");
 
     }
 
     const handleContinueToForm = () => {
-        /* if (fingerprintCount === 4) { */
         setStep(FLOW_STEPS.FORM);
         setMessage("Completando formulario...");
-        /*  } else {
-             alert("Debe registrar las 4 huellas digitales.");
-         } */
     }
 
 
-    // --- PASO 7: FORMULARIO (FORM) ---
-
+    // --- FORMULARIO (FORM) ---
     const handleFormCompleted = (formData) => {
         setData(prevData => ({ ...prevData, formData: formData }));
         setStep(FLOW_STEPS.FINAL_SAVED);
@@ -322,9 +301,9 @@ export default function Enrolamiento() {
     }
 
     const updatePeopleList = (ipfsCid, person) => {
-        if (!person /* || !ipfsCid */) {
+        if (!person) {
             console.error("Los datos de persona o ipfsCid son incompletos.");
-            return JSON.parse(savedPeople) || []; // o retornar solo []
+            return JSON.parse(savedPeople) || [];
         }
         const savedPeople = localStorage.getItem('peopleList');
         try {
@@ -360,12 +339,12 @@ export default function Enrolamiento() {
         setIsLoading(true);
         try {
 
-            // 2. Subir a IPFS (Pinata)
+            // Subir a IPFS (Pinata)
             const { ipfsCid, encryptionKey } = await uploadToPinata(person);
             console.log("Subido a IPFS (Pinata) con CID:", ipfsCid);
             console.log("Calve:", encryptionKey);
 
-            // 3. Descargar y descifrar (prueba)
+            // Descargar y descifrar
             const dataposta = await decryptAndRetrieve(ipfsCid, encryptionKey);
             console.log(dataposta.images, dataposta.json);
             alert(`Proceso completado.\n\nCID en IPFS (Pinata): ${ipfsCid}\n\nRevisá consola para detalles.`);
@@ -373,7 +352,7 @@ export default function Enrolamiento() {
             const result = await crearIdentidad(person.hashIdentidad, ipfsCid);
             if (result.success === false) {
                 setIsLoading(false);
-                console.log(updatePeopleList(ipfsCid, person)); // Ya se mostró el error en crearIdentidad
+                console.log(updatePeopleList(ipfsCid, person));
                 handleClearEnrollment(false);
             } else {
                 console.log("Identidad creada en blockchain con éxito.");
@@ -400,7 +379,6 @@ export default function Enrolamiento() {
 
 
     // ------------------------------------------------------ RENDERS DE VISTA -----------------------------------------------
-
     const renderSelfieCapture = () => (
         <div className="video-card">
             <div className="instructions-box">
@@ -529,19 +507,10 @@ export default function Enrolamiento() {
                 data={data}
                 onFormCompleted={handleFormCompleted}
             />
-
-            {/* Si Forms no tiene onFormCompleted, usa este bloque de simulación: */}
-            {/* <div style={{ padding: '20px', borderTop: '1px solid #ccc', marginTop: '10px' }}>
-                <h2>(Simulación de Guardado)</h2>
-                <p>Presiona para ir al guardado final.</p>
-                <button className="btn-primary" onClick={() => handleFormCompleted({ nombre: "Mock" })}>
-                    GUARDAR Y FINALIZAR
-                </button>
-            </div> */}
         </div>
     );
 
-    // --- NUEVO RENDER FINAL ---
+    // --- RENDER FINAL ---
     const renderFinalSaved = () => (
         <div className="final-screen-card">
             <div className="final-icon-container">
@@ -583,10 +552,6 @@ export default function Enrolamiento() {
 
     const renderFinal = () => (
         <div className="final-screen-card">
-            {/* <div className="final-icon-container">
-                <div className="final-icon">✓</div>
-            </div>
-            <h2>¡Registro Completo!</h2> */}
             <TransactionLogs transactionData={transactionData} />
 
             <button
@@ -600,11 +565,10 @@ export default function Enrolamiento() {
     );
 
 
-    // --- RENDER PRINCIPAL (Switcher) ---
+    // --- RENDER PRINCIPAL ---
     return (
         <div className="enrol-root">
             {isLoading ? (
-                // Puedes pasar un mensaje personalizado o usar el predeterminado
                 <LoadingSpinner message="Subiendo..." />
             ) : (
                 <>

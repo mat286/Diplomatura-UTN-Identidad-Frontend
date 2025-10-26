@@ -15,7 +15,7 @@ const getInitialPeople = () => {
 };
 
 
-const PeopleList = (/* { peopleList } */) => {
+const PeopleList = () => {
     const [peopleList] = useState(getInitialPeople);
     return (
         <div className="card">

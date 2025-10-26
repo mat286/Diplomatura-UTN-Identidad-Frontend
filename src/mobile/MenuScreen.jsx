@@ -13,26 +13,23 @@ const MenuButton = ({ iconPlaceholder, text, onClick }) => (
     </button>
 );
 
-const MenuScreen = ({ onNavigate }) => {
-    const navigate = useNavigate(); // <--- Usa el hook internamente
+const MenuScreen = () => {
+    const navigate = useNavigate();
 
     const handleLogin = (event) => {
-        // En lugar de llamar a una prop, navega directamente:
         navigate(event);
     };
 
     return (
         <div className="menu-screen-container">
             <MenuButton
-                // Placeholder del ícono de Huella Dactilar
-                iconPlaceholder="./identidad.png" // Usando un carácter de ícono Unicode si no se usa una librería como FontAwesome
+                iconPlaceholder="./identidad.png"
                 text="IDENTIDADES"
                 onClick={() => handleLogin('/captura-foto')}
             />
 
             <MenuButton
-                // Placeholder del ícono de Clase/Enseñanza
-                iconPlaceholder="./clases.png" // Usando un carácter de ícono Unicode si no se usa una librería como FontAwesome
+                iconPlaceholder="./clases.png"
                 text="CLASES"
                 onClick={() => handleLogin('clases')}
             />
