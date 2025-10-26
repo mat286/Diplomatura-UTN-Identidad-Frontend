@@ -1,64 +1,139 @@
-# PoC: Enrolamiento y Verificación Facial (face-api.js)
+# 📚 Documentación del Proyecto
 
-Este proyecto es una Prueba de Concepto (PoC) implementada en React para demostrar el **enrolamiento** y la **verificación (matching)** de identidad facial utilizando la librería `face-api.js`.
-"https://github.com/justadudewhohacks/face-api.js/tree/master"
+Bienvenido a la documentación completa del sistema de identidad biométrica. Esta carpeta contiene toda la información necesaria para entender, instalar, usar y desarrollar el sistema.
 
-El mecanismo central es la extracción de un **Descriptor Facial** (un vector matemático único que representa la cara), que se almacena en el navegador y se usa para comparar futuras capturas.
+## 📖 Índice de Documentación
 
-## 🚀 Requisitos y Configuración
+### [DOCUMENTACION.md](./docs/DOCUMENTACION.md)
+**Documentación principal del sistema**
+- Introducción y características
+- Arquitectura del sistema
+- Tecnologías utilizadas
+- Flujo de trabajo
+- Configuración e instalación
+- Guía de uso
+- Seguridad y privacidad
+- API y contratos
 
-### 1. Modelos Necesarios
+### [COMPONENTES.md](./docs/COMPONENTES.md)
+**Documentación detallada de componentes React**
+- AppRouter
+- Enrolamiento
+- KeyProtocolScreen
+- MenuScreen
+- Forms
+- PeopleList
+- ImageDisplay
+- LoadingSpinner
+- TransactionLogs
 
-La aplicación depende de la carga de tres modelos de red neuronal. **Debes descargar los archivos JSON y Weights** (incluidos los `shards` y `manifests`) para los siguientes modelos y colocarlos en la carpeta **`public/models`** de tu proyecto React:
+### [FUNCIONES.md](./docs/FUNCIONES.md)
+**Documentación de funciones utilitarias**
+- identityHash.js - Reconocimiento facial
+- offlineStore.js - Almacenamiento offline
+- encryptAndPackage.js - Cifrado y IPFS
+- sendContractTransaction.js - Blockchain
 
-| Modelo en el Código | Propósito | Archivo JSON Principal |
-| :--- | :--- | :--- |
-| `tinyFaceDetector` | Detección de rostro. | `tiny_face_detector_model.json` |
-| `faceLandmark68Net` | Detección de 68 puntos clave. | `face_landmark_68_model.json` |
-| `faceRecognitionNet` | Extracción del Descriptor Facial. | `face_recognition_model.json` |
+---
 
-### 2. Estructura de Archivos
+## 🚀 Inicio Rápido
 
-Tu directorio `public` debe tener la siguiente estructura:
-```
-/public
-└── models/
-├── tiny_face_detector_model.json
-├── face_landmark_68_model.json
-└── face_recognition_model.json
-└── ... (Archivos de pesos/weights/shards)
-```
+### 1. Leer Primero
+Comienza leyendo [DOCUMENTACION.md](../DOCUMENTACION.md) para obtener una visión general del sistema.
 
-## 🛠️ Explicación del Funcionamiento del Código
+### 2. Configuración
+Sigue la sección "Configuración e Instalación" en la documentación principal para:
+- Instalar dependencias
+- Configurar variables de entorno
+- Descargar modelos de face-api.js
+- Iniciar la aplicación
 
-El código (`App.jsx`) implementa el flujo de enrolamiento y verificación usando el almacenamiento local del navegador (`localStorage`) para persistir la información de identidad.
+### 3. Desarrollo
+Si vas a desarrollar o modificar código:
+- Lee [COMPONENTES.md](./COMPONENTES.md) para entender los componentes React
+- Consulta [FUNCIONES.md](./FUNCIONES.md) para las funciones utilitarias
 
-### 1. Inicialización (`useEffect` & `loadModels`)
+---
 
-1.  **Carga de Modelos:** La función asíncrona `loadModels()` se ejecuta al inicio y llama a `faceapi.nets.XYZ.loadFromUri('/models')` para cargar las tres redes neuronales.
-2.  **Cámara:** Una vez que `modelsLoaded` es `true`, un segundo `useEffect` solicita acceso a la cámara (`navigator.mediaDevices.getUserMedia`) e inicia la transmisión en el elemento `<video>`.
+## 📋 Guías Específicas
 
-### 2. Enrolamiento (`handleEnroll`)
+### Para Usuarios Finales
+- Lee la sección "Uso del Sistema" en [DOCUMENTACION.md](../DOCUMENTACION.md)
 
-Esta función extrae la "huella digital" de la cara para guardarla:
+### Para Desarrolladores
+1. Revisa la "Arquitectura del Sistema" en [DOCUMENTACION.md](../DOCUMENTACION.md)
+2. Estudia los componentes en [COMPONENTES.md](./COMPONENTES.md)
+3. Consulta las funciones en [FUNCIONES.md](./FUNCIONES.md)
 
-1.  **Detección y Extracción:** Captura un *frame* en el `<canvas>` y utiliza el *pipeline* de `faceapi.detectSingleFace().withFaceLandmarks().withFaceDescriptor()` para obtener el **Descriptor Facial** (`Float32Array` de 128 elementos).
-2.  **Cálculo del Hash de Identidad:** Se calcula un **SHA-256** (`sha256HexFromBuffer`) del Descriptor Facial. Este *hash* sirve como una prueba de integridad o **ID de identidad inmutable**.
-3.  **Almacenamiento:**
-    * El Descriptor Facial se convierte a **Base64** (`descriptor_b64`) y se guarda en `localStorage`.
-    * El hash SHA-256 (`hashIdentidad`) se guarda en `localStorage`.
+### Para DevOps
+- Variables de entorno: Ver sección en [DOCUMENTACION.md](../DOCUMENTACION.md)
+- Requisitos de infraestructura: Ver "Requisitos Previos"
 
-### 3. Verificación (`handleVerify`)
+---
 
-Esta función comprueba si la cara actual coincide con el registro guardado:
+## 🔍 Búsqueda Rápida
 
-1.  **Nueva Captura y Extracción:** Se obtiene un nuevo Descriptor Facial (`newDesc`) de la persona actual.
-2.  **Recuperación:** Se recupera el Descriptor almacenado (`storedFloat`) del `localStorage`.
-3.  **Matching por Distancia:** Se calcula la **Distancia Euclidiana** (`euclideanDistance`) entre el Descriptor almacenado y el nuevo.
-    * Si la distancia es $\le 0.5$ (la tolerancia configurada), se considera un **MATCH**.
-4.  **Verificación Criptográfica (Integridad):** Se recalcula el hash SHA-256 del descriptor almacenado y se compara con el `hashIdentidad` guardado, asegurando que el registro no fue alterado.
+### ¿Cómo funciona el reconocimiento facial?
+Ver: [DOCUMENTACION.md](../DOCUMENTACION.md#flujo-de-trabajo) y [FUNCIONES.md](./FUNCIONES.md#identityhashjs)
 
-### ⚠️ Nota de Seguridad
+### ¿Cómo se cifran los datos?
+Ver: [FUNCIONES.md](./FUNCIONES.md#encryptandpackagejs)
 
-El código utiliza `localStorage` para guardar el descriptor. **En un entorno de producción, esta información sensible debe ser cifrada robustamente** (por ejemplo, con Web Crypto API o claves derivadas de una contraseña) antes de ser almacenada o enviada a un sistema externo (como IPFS o una *blockchain*).
+### ¿Cómo interactúa con blockchain?
+Ver: [FUNCIONES.md](./FUNCIONES.md#sendcontracttransactionjs)
 
+### ¿Cómo funciona el almacenamiento offline?
+Ver: [FUNCIONES.md](./FUNCIONES.md#offlinestorejs)
+
+### ¿Cómo agregar un nuevo componente?
+Ver: [COMPONENTES.md](./COMPONENTES.md)
+
+---
+
+## 📝 Convenciones
+
+### Código
+- Archivos de funciones: CamelCase (ej: `identityHash.js`)
+- Componentes React: PascalCase (ej: `Enrolamiento.jsx`)
+- Funciones: camelCase (ej: `handleCapturePhoto()`)
+
+### Documentación
+- Archivos MD: UPPERCASE (ej: `DOCUMENTACION.md`)
+- Headers: Usar # para niveles
+
+---
+
+## ❓ Preguntas Frecuentes
+
+### ¿Dónde está la configuración?
+Ver sección "Variables de Entorno" en [DOCUMENTACION.md](../DOCUMENTACION.md)
+
+### ¿Cómo subir datos a IPFS?
+Ver función `uploadToPinata()` en [FUNCIONES.md](./FUNCIONES.md#uploadtopinata)
+
+### ¿Cómo registrar en blockchain?
+Ver función `crearIdentidad()` en [FUNCIONES.md](./FUNCIONES.md#crearidentidad)
+
+---
+
+## 🔗 Enlaces Útiles
+
+- [face-api.js](https://github.com/justadudewhohacks/face-api.js)
+- [IPFS Pinata](https://www.pinata.cloud/)
+- [Ethers.js](https://docs.ethers.io/)
+- [React Router](https://reactrouter.com/)
+- [localforage](https://localforage.github.io/localForage/)
+- [Contrato](https://github.com/mat286/Diplomatura-UTN-Identidad-)
+
+
+---
+
+## 📞 Soporte
+
+Para preguntas o problemas:
+1. Revisa la documentación relevante
+2. Consulta la sección "Troubleshooting" en [DOCUMENTACION.md](../DOCUMENTACION.md)
+
+---
+
+**Última actualización:** Octubre 2025

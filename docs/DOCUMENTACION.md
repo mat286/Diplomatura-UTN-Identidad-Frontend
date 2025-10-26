@@ -513,9 +513,8 @@ Este proyecto está bajo licencia [MIT](LICENSE).
 ## 📞 Contacto
 
 Para preguntas o soporte:
-- Email: [tu-email@ejemplo.com]
-- Issues: [GitHub Issues](https://github.com/tu-usuario/identity/issues)
+- Email: [riveramateo10432@gmail.com]
 
 ---
 
-**Última actualización:** Diciembre 2024
+**Última actualización:** Octubre 2025
